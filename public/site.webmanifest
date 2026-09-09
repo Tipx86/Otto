@@ -1,0 +1,37 @@
+{
+  "name": "Ride With Us — Car Rental Kenya",
+  "short_name": "Ride With Us",
+  "description": "Premium self-drive and chauffeured vehicle hire in Kenya. Book online in minutes — Nairobi, Mombasa, Kisumu & beyond.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "categories": ["travel", "automotive"],
+  "lang": "en-KE",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Book a Car",
+      "short_name": "Book Now",
+      "description": "Go directly to car booking",
+      "url": "/?page=booking",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Browse Fleet",
+      "short_name": "Fleet",
+      "description": "Browse our full vehicle fleet",
+      "url": "/?page=fleet",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    }
+  ]
+}

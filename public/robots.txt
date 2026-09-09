@@ -1,0 +1,12 @@
+# Robots.txt for EliteRide — Car Rental Kenya
+# https://ottorental.com/robots.txt
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://ottorental.com/sitemap.xml
+
+# Block admin and internal pages from indexing
+Disallow: /admin
+Disallow: /admin/
