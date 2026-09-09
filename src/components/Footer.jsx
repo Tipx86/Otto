@@ -26,8 +26,14 @@ export default function Footer() {
             <div className="lg:col-span-2 space-y-4">
               <div 
                 onClick={() => navigateTo('home')}
-                className="flex items-center gap-1.5 cursor-pointer select-none"
+                className="flex items-center gap-2.5 cursor-pointer select-none group"
               >
+                <div className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-slate-900 transition-transform group-hover:scale-110">
+                  <svg viewBox="0 0 100 100" className="w-full h-full fill-none">
+                    <circle cx="50" cy="50" r="36" stroke="currentColor" strokeWidth="15" />
+                    <circle cx="50" cy="50" r="14" fill="currentColor" />
+                  </svg>
+                </div>
                 <span className="font-extrabold text-2xl sm:text-3xl tracking-tight text-slate-900 font-sans">
                   Elite<span className="text-blue-600">Ride</span>
                 </span>

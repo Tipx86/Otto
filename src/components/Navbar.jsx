@@ -45,11 +45,17 @@ export default function Navbar() {
         isHomePage ? 'text-white' : 'text-slate-900 bg-white/90 backdrop-blur-md border-b border-slate-200'
       }`}>
         
-        {/* Brand Logo - 'EliteRide' bold clean typography */}
+        {/* Brand Logo - Official bullseye mark + bold typography */}
         <div 
           onClick={() => handleNavClick('home')}
-          className="flex items-center gap-1.5 cursor-pointer group select-none"
+          className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group select-none"
         >
+          <div className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center transition-transform group-hover:scale-110">
+            <svg viewBox="0 0 100 100" className="w-full h-full fill-none">
+              <circle cx="50" cy="50" r="36" stroke="currentColor" strokeWidth="15" />
+              <circle cx="50" cy="50" r="14" fill="currentColor" />
+            </svg>
+          </div>
           <span className={`font-extrabold text-2xl sm:text-3xl tracking-tight font-sans ${
             isHomePage ? 'text-white' : 'text-slate-900'
           }`}>
@@ -130,9 +136,18 @@ export default function Navbar() {
             
             <div className="space-y-8">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                <span className="font-extrabold text-2xl tracking-tight text-slate-900">
-                  Elite<span className="text-blue-600">Ride</span>
-                </span>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 flex items-center justify-center text-slate-900">
+                    <svg viewBox="0 0 100 100" className="w-full h-full fill-none">
+                      <circle cx="50" cy="50" r="36" stroke="currentColor" strokeWidth="15" />
+                      <circle cx="50" cy="50" r="14" fill="currentColor" />
+                    </svg>
+                  </div>
+                  <span className="font-extrabold text-2xl tracking-tight text-slate-900">
+                    Elite<span className="text-blue-600">Ride</span>
+                  </span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 mt-1"></span>
+                </div>
                 <button
                   onClick={() => setMenuOpen(false)}
                   className="p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900"
