@@ -54,6 +54,9 @@ export default function AdminDashboard() {
     exportBackupJSON, 
     importBackupJSON, 
     downloadInitialDataJS,
+    cloudSyncStatus,
+    syncFleetToCloud,
+    syncContentToCloud,
     navigateTo, 
     showToast 
   } = useApp();
@@ -341,11 +344,23 @@ export default function AdminDashboard() {
         {/* Top Admin Header */}
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold uppercase">
                 <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                 Admin Session Active
               </span>
+
+              {cloudSyncStatus.configured ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold uppercase">
+                  <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                  Vercel KV Cloud Live (Multi-Device)
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold uppercase">
+                  <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                  Local Device Storage
+                </span>
+              )}
               <span className="text-xs text-slate-500">EliteRide Fleet & CMS</span>
             </div>
             <h1 className="font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight mt-1">
@@ -353,7 +368,17 @@ export default function AdminDashboard() {
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={() => syncFleetToCloud()}
+              disabled={cloudSyncStatus.syncing}
+              className="px-4 py-2 rounded-full bg-blue-50 hover:bg-blue-100 border border-blue-200 text-xs font-bold text-blue-700 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              title="Push vehicle fleet updates directly to Vercel KV cloud storage"
+            >
+              <UploadCloud className={`w-3.5 h-3.5 ${cloudSyncStatus.syncing ? 'animate-spin' : ''}`} />
+              <span>{cloudSyncStatus.syncing ? 'Syncing...' : 'Sync to Cloud'}</span>
+            </button>
+
             <button
               onClick={() => navigateTo('home')}
               className="px-4 py-2 rounded-full border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-700 transition-colors flex items-center gap-1.5"
@@ -1072,61 +1097,131 @@ export default function AdminDashboard() {
           </form>
         )}
 
-        {/* TAB 6: BACKUP & RESTORE */}
+        {/* TAB 6: BACKUP & RESTORE / CLOUD SYNC */}
         {activeTab === 'backup' && (
-          <div className="bg-white rounded-3xl p-8 max-w-2xl mx-auto border border-slate-200 shadow-sm text-center space-y-6 animate-fade-in">
-            <div className="w-16 h-16 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
-              <Download className="w-8 h-8" />
+          <div className="bg-white rounded-3xl p-8 max-w-2xl mx-auto border border-slate-200 shadow-sm space-y-6 animate-fade-in">
+            <div className="text-center space-y-3">
+              <div className="w-16 h-16 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
+                <UploadCloud className="w-8 h-8" />
+              </div>
+
+              <div>
+                <h2 className="font-extrabold text-2xl text-slate-900">
+                  Cloud Database & Multi-Device Sync
+                </h2>
+                <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                  Keep your entire fleet, custom pricing, and photos synchronized across all phones, tablets, and computers worldwide.
+                </p>
+              </div>
             </div>
 
-            <div>
-              <h2 className="font-extrabold text-2xl text-slate-900">
-                Database Backup & Cloud Sync
-              </h2>
-              <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                Export your fleet inventory, device photos, bookings, and CMS settings as a portable JSON backup file.
+            {/* Cloud Status Card */}
+            <div className={`rounded-2xl p-5 border text-left space-y-3 ${
+              cloudSyncStatus.configured 
+                ? 'bg-blue-50/70 border-blue-200 text-blue-950' 
+                : 'bg-amber-50/70 border-amber-200 text-amber-950'
+            }`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`w-3 h-3 rounded-full ${cloudSyncStatus.configured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
+                  <span className="font-extrabold text-sm uppercase tracking-wide">
+                    {cloudSyncStatus.configured 
+                      ? 'Vercel KV Cloud Database Connected' 
+                      : 'Running in Local Browser Storage'}
+                  </span>
+                </div>
+                {cloudSyncStatus.lastSync && (
+                  <span className="text-[11px] font-mono text-slate-500">
+                    Last synced: {cloudSyncStatus.lastSync}
+                  </span>
+                )}
+              </div>
+
+              <p className="text-xs leading-relaxed text-slate-700">
+                {cloudSyncStatus.configured ? (
+                  <>
+                    ✅ <strong>Active Multi-Device Sync:</strong> Any vehicle, price change, or photo you save is automatically written to your Vercel KV cloud database. When you or any client opens the website on a new device, it loads your latest updates immediately.
+                  </>
+                ) : (
+                  <>
+                    ⚠️ <strong>Currently in Local Mode:</strong> Your updates are safely stored in this browser via IndexedDB. To make changes reflect on <em>all new devices</em> (phones, iPads, other laptops), connect Vercel KV in your Vercel Project.
+                  </>
+                )}
               </p>
+
+              {!cloudSyncStatus.configured && (
+                <div className="bg-white/80 p-3.5 rounded-xl border border-amber-200/80 text-xs space-y-2 text-slate-800">
+                  <span className="font-bold block text-amber-900">
+                    How to enable Cross-Device Sync on Vercel (1 Minute):
+                  </span>
+                  <ol className="list-decimal list-inside space-y-1 text-[11px] text-slate-600">
+                    <li>Go to your project on <a href="https://vercel.com" target="_blank" rel="noreferrer" className="underline font-bold text-blue-600">vercel.com</a></li>
+                    <li>Click the <strong>Storage</strong> tab in the top navigation</li>
+                    <li>Click <strong>Connect Database</strong> and choose <strong>KV / Upstash Redis</strong></li>
+                    <li>Click <strong>Connect</strong> and accept the defaults — that's it!</li>
+                  </ol>
+                </div>
+              )}
+
+              <div className="pt-1 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => syncFleetToCloud()}
+                  disabled={cloudSyncStatus.syncing}
+                  className="btn-otto-primary text-xs py-2.5 px-5 shadow-sm inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <UploadCloud className={`w-4 h-4 ${cloudSyncStatus.syncing ? 'animate-spin' : ''}`} />
+                  <span>{cloudSyncStatus.syncing ? 'Syncing to Cloud...' : 'Push Local Catalog to Cloud Now'}</span>
+                </button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-              <button
-                onClick={downloadInitialDataJS}
-                className="btn-otto-primary py-3.5 px-4 text-xs uppercase flex items-center justify-center gap-2 shadow-md cursor-pointer bg-emerald-600 hover:bg-emerald-700"
-                title="Download updated initialData.js to permanently bake changes into the website repository"
-              >
-                <Code2 className="w-4 h-4" />
-                <span>Save to Codebase</span>
-              </button>
+            {/* Offline and Portability Tools */}
+            <div className="pt-2 text-center space-y-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                Codebase & File Backups
+              </span>
 
-              <button
-                onClick={exportBackupJSON}
-                className="py-3.5 px-4 rounded-full border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center justify-center gap-2 shadow-sm cursor-pointer transition-colors"
-              >
-                <Download className="w-4 h-4 text-blue-600" />
-                <span>Export Backup JSON</span>
-              </button>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button
+                  onClick={downloadInitialDataJS}
+                  className="py-3 px-3 rounded-2xl border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center justify-center gap-2 shadow-xs cursor-pointer transition-colors"
+                  title="Download initialData.js to permanently commit changes directly into Git"
+                >
+                  <Code2 className="w-4 h-4 text-emerald-600" />
+                  <span>Save to Codebase</span>
+                </button>
 
-              <label className="px-4 py-3.5 rounded-full border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center justify-center gap-2 cursor-pointer transition-colors">
-                <Upload className="w-4 h-4 text-blue-600" />
-                <span>Import Backup JSON</span>
-                <input
-                  type="file"
-                  accept=".json"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = (event) => {
-                        if (event.target?.result) {
-                          importBackupJSON(event.target.result.toString());
-                        }
-                      };
-                      reader.readAsText(file);
-                    }
-                  }}
-                />
-              </label>
+                <button
+                  onClick={exportBackupJSON}
+                  className="py-3 px-3 rounded-2xl border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center justify-center gap-2 shadow-xs cursor-pointer transition-colors"
+                >
+                  <Download className="w-4 h-4 text-blue-600" />
+                  <span>Export Backup JSON</span>
+                </button>
+
+                <label className="py-3 px-3 rounded-2xl border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-xs">
+                  <Upload className="w-4 h-4 text-blue-600" />
+                  <span>Import Backup JSON</span>
+                  <input
+                    type="file"
+                    accept=".json"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          if (event.target?.result) {
+                            importBackupJSON(event.target.result.toString());
+                          }
+                        };
+                        reader.readAsText(file);
+                      }
+                    }}
+                  />
+                </label>
+              </div>
             </div>
 
             {/* Storage Protection Notice */}
@@ -1135,8 +1230,8 @@ export default function AdminDashboard() {
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>Persistent Dual-Layer Storage (IndexedDB + LocalStorage) Active</span>
               </div>
-              <p className="text-emerald-700 leading-relaxed">
-                Your pricing adjustments, vehicle availability, and uploaded photos are automatically saved to persistent IndexedDB with smart image compression so they will never disappear on reload.
+              <p className="text-emerald-700 leading-relaxed text-[11px]">
+                Your pricing adjustments, vehicle availability, and uploaded photos are always preserved in offline browser IndexedDB with smart image compression so work is never lost.
               </p>
             </div>
 

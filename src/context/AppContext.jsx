@@ -42,27 +42,88 @@ export function AppProvider({ children }) {
     getInitialSync(STORAGE_KEYS.WISHLIST, ['premium-suv-prado', 'luxury-suv-lc300'])
   );
 
-  // Hydrate from IndexedDB on startup (loads high-res device photos & large catalogs safely)
+  // Cloud Sync Status
+  const [cloudSyncStatus, setCloudSyncStatus] = useState({
+    configured: false,
+    source: 'local',
+    lastSync: null,
+    syncing: false
+  });
+
+  // Hydrate from Local Storage first, then check Cloud KV for Cross-Device Synchronization
   useEffect(() => {
-    async function hydrateStorage() {
+    let isMounted = true;
+
+    async function hydrateStorageAndCloud() {
+      // 1. Instant local IndexedDB hydration
       try {
         const idbFleet = await loadFromIndexedDB(STORAGE_KEYS.FLEET);
-        if (idbFleet && Array.isArray(idbFleet) && idbFleet.length > 0) {
+        if (isMounted && idbFleet && Array.isArray(idbFleet) && idbFleet.length > 0) {
           setFleet(idbFleet);
         }
         const idbBookings = await loadFromIndexedDB(STORAGE_KEYS.BOOKINGS);
-        if (idbBookings && Array.isArray(idbBookings)) {
+        if (isMounted && idbBookings && Array.isArray(idbBookings)) {
           setBookings(idbBookings);
         }
         const idbContent = await loadFromIndexedDB(STORAGE_KEYS.SITE_CONTENT);
-        if (idbContent && typeof idbContent === 'object') {
+        if (isMounted && idbContent && typeof idbContent === 'object') {
           setSiteContent(idbContent);
         }
       } catch (err) {
-        console.warn('[Storage] Hydration check failed:', err);
+        console.warn('[Storage] Local hydration warning:', err);
+      }
+
+      // 2. Fetch master state from Cloud KV (cross-device sync)
+      try {
+        const fleetRes = await fetch('/api/fleet');
+        if (fleetRes.ok) {
+          const json = await fleetRes.json();
+          if (isMounted) {
+            setCloudSyncStatus(prev => ({
+              ...prev,
+              configured: Boolean(json.configured),
+              source: json.source || 'local'
+            }));
+
+            // If cloud has master inventory, sync to this device!
+            if (json.source === 'cloud' && Array.isArray(json.data) && json.data.length > 0) {
+              setFleet(json.data);
+              await savePersistent(STORAGE_KEYS.FLEET, json.data);
+              setCloudSyncStatus(prev => ({
+                ...prev,
+                lastSync: new Date().toLocaleTimeString()
+              }));
+            }
+          }
+        }
+
+        // Fetch master CMS content from cloud
+        const contentRes = await fetch('/api/content');
+        if (contentRes.ok) {
+          const contentJson = await contentRes.json();
+          if (isMounted && contentJson.source === 'cloud' && contentJson.data) {
+            setSiteContent(contentJson.data);
+            await savePersistent(STORAGE_KEYS.SITE_CONTENT, contentJson.data);
+          }
+        }
+
+        // Fetch master bookings from cloud
+        const bookingsRes = await fetch('/api/bookings');
+        if (bookingsRes.ok) {
+          const bookingsJson = await bookingsRes.json();
+          if (isMounted && bookingsJson.configured && Array.isArray(bookingsJson.data) && bookingsJson.data.length > 0) {
+            setBookings(bookingsJson.data);
+            await savePersistent(STORAGE_KEYS.BOOKINGS, bookingsJson.data);
+          }
+        }
+      } catch (err) {
+        // Dev server or offline
+        console.info('[Cloud Sync] Running in local offline mode:', err.message);
       }
     }
-    hydrateStorage();
+
+    hydrateStorageAndCloud();
+    return () => { isMounted = false; };
   }, []);
 
   // Admin Auth State (session)
@@ -124,6 +185,60 @@ export function AppProvider({ children }) {
     savePersistent(STORAGE_KEYS.WISHLIST, wishlist);
   }, [wishlist]);
 
+  // Cloud Synchronization Handlers
+  const syncFleetToCloud = async (overrideFleet = null) => {
+    const dataToSend = overrideFleet || fleet;
+    setCloudSyncStatus(prev => ({ ...prev, syncing: true }));
+    try {
+      const res = await fetch('/api/fleet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fleet: dataToSend })
+      });
+      const json = await res.json();
+      if (json.configured) {
+        setCloudSyncStatus({
+          configured: true,
+          source: 'cloud',
+          lastSync: new Date().toLocaleTimeString(),
+          syncing: false
+        });
+        showToast('Fleet successfully synced across all devices via Vercel KV!', 'success');
+        return true;
+      } else {
+        setCloudSyncStatus({
+          configured: false,
+          source: 'local',
+          lastSync: null,
+          syncing: false
+        });
+        showToast('Saved locally. Connect Vercel KV in your Vercel Dashboard to sync to all devices.', 'info');
+        return false;
+      }
+    } catch (err) {
+      setCloudSyncStatus(prev => ({ ...prev, syncing: false }));
+      console.warn('[Cloud Sync] Failed:', err);
+      return false;
+    }
+  };
+
+  const syncContentToCloud = async (overrideContent = null) => {
+    const dataToSend = overrideContent || siteContent;
+    try {
+      const res = await fetch('/api/content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ siteContent: dataToSend })
+      });
+      const json = await res.json();
+      if (json.configured) {
+        showToast('Website content synced to cloud database!', 'success');
+      }
+    } catch (err) {
+      console.warn('[Content Cloud Sync] Failed:', err);
+    }
+  };
+
   // Price conversion helper (Supports KSh as prominent, USD, EUR, GBP, AED)
   const formatPrice = (amountUSD, customKsh = null) => {
     if (currency === 'KSH') {
@@ -164,7 +279,7 @@ export function AppProvider({ children }) {
     });
   };
 
-  // Fleet CRUD Actions (Admin)
+  // Fleet CRUD Actions (Admin) with automatic cloud sync
   const addCar = (newCarData) => {
     const id = newCarData.id || newCarData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now().toString().slice(-4);
     const car = {
@@ -175,34 +290,44 @@ export function AppProvider({ children }) {
       status: newCarData.status || 'available',
       blockedDates: newCarData.blockedDates || []
     };
-    setFleet(prev => [car, ...prev]);
+    const updatedFleet = [car, ...fleet];
+    setFleet(updatedFleet);
+    syncFleetToCloud(updatedFleet);
     showToast(`Vehicle "${car.name}" added to the fleet catalog!`, 'success');
     return car;
   };
 
   const updateCar = (carId, updatedFields) => {
-    setFleet(prev => prev.map(car => car.id === carId ? { ...car, ...updatedFields } : car));
+    const updatedFleet = fleet.map(car => car.id === carId ? { ...car, ...updatedFields } : car);
+    setFleet(updatedFleet);
+    syncFleetToCloud(updatedFleet);
     showToast('Vehicle details updated successfully.', 'success');
   };
 
   const deleteCar = (carId) => {
-    setFleet(prev => prev.filter(car => car.id !== carId));
+    const updatedFleet = fleet.filter(car => car.id !== carId);
+    setFleet(updatedFleet);
+    syncFleetToCloud(updatedFleet);
     showToast('Vehicle removed from the fleet system.', 'gold');
   };
 
   const toggleCarStatus = (carId, newStatus) => {
-    setFleet(prev => prev.map(car => car.id === carId ? { ...car, status: newStatus } : car));
+    const updatedFleet = fleet.map(car => car.id === carId ? { ...car, status: newStatus } : car);
+    setFleet(updatedFleet);
+    syncFleetToCloud(updatedFleet);
     showToast(`Vehicle status updated to: ${newStatus.toUpperCase()}`, 'info');
   };
 
   const toggleCarBlockedDate = (carId, dateStr) => {
-    setFleet(prev => prev.map(car => {
+    const updatedFleet = fleet.map(car => {
       if (car.id !== carId) return car;
       const currentBlocked = car.blockedDates || [];
       const exists = currentBlocked.includes(dateStr);
       const newBlocked = exists ? currentBlocked.filter(d => d !== dateStr) : [...currentBlocked, dateStr];
       return { ...car, blockedDates: newBlocked };
-    }));
+    });
+    setFleet(updatedFleet);
+    syncFleetToCloud(updatedFleet);
   };
 
   // Bookings CRUD
@@ -215,6 +340,16 @@ export function AppProvider({ children }) {
       ...newBookingData
     };
     setBookings(prev => [fullBooking, ...prev]);
+
+    // Push reservation to cloud
+    try {
+      fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ booking: fullBooking })
+      }).catch(() => {});
+    } catch {}
+
     return fullBooking;
   };
 
@@ -250,6 +385,7 @@ export function AppProvider({ children }) {
   // CMS Content Management
   const updateSiteContent = (newContent) => {
     setSiteContent(newContent);
+    syncContentToCloud(newContent);
     showToast('Website content updated live!', 'success');
   };
 
@@ -266,6 +402,8 @@ export function AppProvider({ children }) {
       await savePersistent(STORAGE_KEYS.FLEET, INITIAL_CARS);
       await savePersistent(STORAGE_KEYS.BOOKINGS, INITIAL_BOOKINGS);
       await savePersistent(STORAGE_KEYS.SITE_CONTENT, INITIAL_SITE_CONTENT);
+      syncFleetToCloud(INITIAL_CARS);
+      syncContentToCloud(INITIAL_SITE_CONTENT);
     } catch {}
     showToast('All fleet and site content reset to Otto defaults.', 'gold');
   };
@@ -312,10 +450,16 @@ export const INITIAL_BOOKINGS = ${JSON.stringify(bookings, null, 2)};
   const importBackupJSON = (jsonString) => {
     try {
       const parsed = JSON.parse(jsonString);
-      if (parsed.fleet) setFleet(parsed.fleet);
+      if (parsed.fleet) {
+        setFleet(parsed.fleet);
+        syncFleetToCloud(parsed.fleet);
+      }
       if (parsed.bookings) setBookings(parsed.bookings);
-      if (parsed.siteContent) setSiteContent(parsed.siteContent);
-      showToast('Backup restored successfully!', 'success');
+      if (parsed.siteContent) {
+        setSiteContent(parsed.siteContent);
+        syncContentToCloud(parsed.siteContent);
+      }
+      showToast('Backup restored and pushed to cloud!', 'success');
       return true;
     } catch (err) {
       showToast('Invalid backup file format.', 'error');
@@ -361,7 +505,10 @@ export const INITIAL_BOOKINGS = ${JSON.stringify(bookings, null, 2)};
         resetToDefaults,
         exportBackupJSON,
         importBackupJSON,
-        downloadInitialDataJS
+        downloadInitialDataJS,
+        cloudSyncStatus,
+        syncFleetToCloud,
+        syncContentToCloud
       }}
     >
       {children}
