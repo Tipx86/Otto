@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { trackViewItem, trackBeginCheckout } from '../utils/analytics';
 import { 
@@ -63,8 +63,10 @@ export default function CarDetailsPage() {
     };
   }, [pickupDate, returnDate, car.dailyPrice, car.securityDeposit, chauffeurIncluded, fullProtection]);
 
+  const lastViewedCarIdRef = useRef('');
   useEffect(() => {
-    if (car) {
+    if (car && lastViewedCarIdRef.current !== car.id) {
+      lastViewedCarIdRef.current = car.id;
       trackViewItem(car);
     }
   }, [car]);

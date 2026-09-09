@@ -37,6 +37,14 @@ const SENSITIVE_KEYS = new Set([
   'idnumber'
 ]);
 
+// Initialize dataLayer and gtag shim immediately in browser
+if (isBrowser) {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = window.gtag || function () {
+    window.dataLayer.push(arguments);
+  };
+}
+
 /**
  * Strips any sensitive or PII fields from analytics parameters.
  */
@@ -121,7 +129,16 @@ export function initGA() {
  * Generic safe event dispatcher
  */
 export function trackEvent(eventName, params = {}) {
-  if (!isBrowser || !GA_MEASUREMENT_ID || typeof window.gtag !== 'function') {
+  if (!isBrowser || !GA_MEASUREMENT_ID) {
+    return;
+  }
+
+  // Ensure GA is initialized
+  if (!window.__ga_initialized) {
+    initGA();
+  }
+
+  if (typeof window.gtag !== 'function') {
     return;
   }
 
@@ -295,4 +312,9 @@ export function trackLogin(method = 'PIN') {
   trackEvent('login', {
     method
   });
+}
+
+// Auto-initialize when loaded in browser if valid Measurement ID is present
+if (isBrowser && GA_MEASUREMENT_ID && GA_MEASUREMENT_ID.startsWith('G-')) {
+  initGA();
 }
