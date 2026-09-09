@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { CATEGORIES, CITIES_WE_SERVE } from '../data/initialData';
 import CarCard from '../components/CarCard';
+import { trackSearch } from '../utils/analytics';
 import { 
   MapPin, 
   Search, 
@@ -75,6 +76,13 @@ export default function HomePage() {
 
   const handleHeroSearch = (e) => {
     e.preventDefault();
+    trackSearch(startLocation, {
+      rental_mode: rentalMode,
+      pickup_location: startLocation,
+      dropoff_location: returnLocation,
+      pickup_date: pickupDate,
+      return_date: returnDate
+    });
     setBookingDraft(prev => ({
       ...prev,
       rentalMode,

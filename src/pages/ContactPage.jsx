@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { trackGenerateLead } from '../utils/analytics';
 import { 
   Phone, 
   Mail, 
@@ -30,6 +31,7 @@ export default function ContactPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    trackGenerateLead(formData.serviceInterest || 'General Inquiry', 'Contact Page Form');
     setSubmitted(true);
     showToast('Inquiry submitted. An EliteRide concierge will contact you shortly.', 'success');
   };

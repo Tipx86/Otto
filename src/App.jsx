@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -13,15 +13,44 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import FaqsPage from './pages/FaqsPage';
 import AdminDashboard from './pages/AdminDashboard';
+import { initGA, trackPageView } from './utils/analytics';
 import './styles/theme.css';
 
 function MainRouter() {
   const { currentPage, fleet, selectedCarId } = useApp();
+  const lastTrackedRef = useRef('');
 
   // Resolve the currently-viewed car (for SEO meta on car detail pages)
   const selectedCar = currentPage === 'car-details'
     ? (fleet.find(c => c.id === selectedCarId) || null)
     : null;
+
+  // SPA Route Page View Tracking (GA4)
+  useEffect(() => {
+    const routePath = (() => {
+      switch (currentPage) {
+        case 'car-details': return `/cars/${selectedCarId || 'view'}`;
+        case 'fleet':       return '/fleet';
+        case 'booking':     return `/booking${selectedCarId ? `?car=${selectedCarId}` : ''}`;
+        case 'contact':     return '/contact';
+        case 'about':       return '/about';
+        case 'faqs':        return '/faqs';
+        case 'admin':       return '/admin';
+        case 'home':
+        default:            return '/';
+      }
+    })();
+
+    const pageTitle = selectedCar 
+      ? `${selectedCar.name} | EliteRide Kenya`
+      : (document.title || `EliteRide - ${currentPage}`);
+
+    const trackingKey = `${routePath}::${pageTitle}`;
+    if (lastTrackedRef.current !== trackingKey) {
+      lastTrackedRef.current = trackingKey;
+      trackPageView(routePath, pageTitle);
+    }
+  }, [currentPage, selectedCarId, selectedCar]);
 
   // Map internal page names to SEO page keys
   const seoPage = (() => {
@@ -68,6 +97,10 @@ function MainRouter() {
 }
 
 export default function App() {
+  useEffect(() => {
+    initGA();
+  }, []);
+
   return (
     <AppProvider>
       <MainRouter />

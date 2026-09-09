@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { CATEGORIES, BRANDS } from '../data/initialData';
 import CarCard from '../components/CarCard';
+import { trackSearch } from '../utils/analytics';
 import { 
   Search, 
   RotateCcw, 
@@ -18,6 +19,14 @@ export default function FleetPage() {
   const [selectedBrand, setSelectedBrand] = useState('All Brands');
   const [maxPrice, setMaxPrice] = useState(300); // USD
   const [availableOnly, setAvailableOnly] = useState(false);
+
+  useEffect(() => {
+    if (!searchTerm.trim()) return;
+    const timer = setTimeout(() => {
+      trackSearch(searchTerm.trim(), { search_type: 'fleet_filter' });
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const filteredCars = useMemo(() => {
     return fleet.filter(car => {

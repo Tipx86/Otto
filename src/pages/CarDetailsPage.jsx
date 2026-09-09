@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
+import { trackViewItem, trackBeginCheckout } from '../utils/analytics';
 import { 
   ChevronLeft, 
   ChevronRight,
@@ -62,7 +63,14 @@ export default function CarDetailsPage() {
     };
   }, [pickupDate, returnDate, car.dailyPrice, car.securityDeposit, chauffeurIncluded, fullProtection]);
 
+  useEffect(() => {
+    if (car) {
+      trackViewItem(car);
+    }
+  }, [car]);
+
   const handleBookNow = () => {
+    trackBeginCheckout(car, calculation);
     setBookingDraft({
       carId: car.id,
       rentalMode: chauffeurIncluded ? 'chauffeured' : 'self-drive',

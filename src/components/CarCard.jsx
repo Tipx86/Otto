@@ -1,11 +1,13 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { Camera } from 'lucide-react';
+import { trackSelectItem } from '../utils/analytics';
 
 export default function CarCard({ car }) {
   const { formatPrice, navigateTo, setBookingDraft } = useApp();
 
   const handleCardClick = () => {
+    trackSelectItem(car);
     setBookingDraft(prev => ({
       ...prev,
       carId: car.id

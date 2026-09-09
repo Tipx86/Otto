@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import confetti from 'canvas-confetti';
+import { trackPurchase } from '../utils/analytics';
 import { 
   Check, 
   ArrowRight, 
@@ -231,6 +232,7 @@ Hello EliteRide Concierge, I have submitted this reservation and would like to c
       addOns: calculation.addOns
     });
 
+    trackPurchase(newBooking);
     setConfirmedBooking(newBooking);
     setStep(4);
 

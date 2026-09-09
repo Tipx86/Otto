@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_CARS, INITIAL_BOOKINGS, CURRENCY_RATES } from '../data/initialData';
 import { INITIAL_SITE_CONTENT } from '../data/siteContent';
+import { trackAddToWishlist, trackLogin } from '../utils/analytics';
 
 const AppContext = createContext();
 
@@ -169,6 +170,10 @@ export function AppProvider({ children }) {
     setWishlist(prev => {
       const exists = prev.includes(carId);
       const updated = exists ? prev.filter(id => id !== carId) : [...prev, carId];
+      if (!exists) {
+        const car = fleet.find(c => c.id === carId);
+        if (car) trackAddToWishlist(car);
+      }
       showToast(exists ? 'Removed from saved vehicles' : 'Saved to your collection', 'gold');
       return updated;
     });
@@ -242,6 +247,7 @@ export function AppProvider({ children }) {
   const adminLogin = (enteredPin) => {
     const validPin = siteContent.brand.securityPin || '8888';
     if (enteredPin.trim() === validPin.trim()) {
+      trackLogin('PIN');
       setIsAdminAuthenticated(true);
       showToast('Admin access authorized. Welcome.', 'success');
       return true;
