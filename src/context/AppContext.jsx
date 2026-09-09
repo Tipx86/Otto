@@ -2,6 +2,12 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_CARS, INITIAL_BOOKINGS, CURRENCY_RATES } from '../data/initialData';
 import { INITIAL_SITE_CONTENT } from '../data/siteContent';
 import { trackAddToWishlist, trackLogin } from '../utils/analytics';
+import { 
+  STORAGE_KEYS, 
+  savePersistent, 
+  getInitialSync, 
+  loadFromIndexedDB 
+} from '../utils/storage';
 
 const AppContext = createContext();
 
@@ -11,54 +17,53 @@ export function AppProvider({ children }) {
   const [selectedCarId, setSelectedCarId] = useState('premium-suv-prado');
   const [quickViewCar, setQuickViewCar] = useState(null);
 
-  // Persistence: Fleet
-  const [fleet, setFleet] = useState(() => {
-    try {
-      const saved = localStorage.getItem('otto_fleet_v3');
-      return saved ? JSON.parse(saved) : INITIAL_CARS;
-    } catch {
-      return INITIAL_CARS;
-    }
-  });
+  // Persistence: Fleet (Immediate sync read + async IndexedDB hydration)
+  const [fleet, setFleet] = useState(() => 
+    getInitialSync(STORAGE_KEYS.FLEET, INITIAL_CARS)
+  );
 
   // Persistence: Bookings
-  const [bookings, setBookings] = useState(() => {
-    try {
-      const saved = localStorage.getItem('eliteride_bookings_v1');
-      return saved ? JSON.parse(saved) : INITIAL_BOOKINGS;
-    } catch {
-      return INITIAL_BOOKINGS;
-    }
-  });
+  const [bookings, setBookings] = useState(() => 
+    getInitialSync(STORAGE_KEYS.BOOKINGS, INITIAL_BOOKINGS)
+  );
 
   // Persistence: Site Content (CMS)
-  const [siteContent, setSiteContent] = useState(() => {
-    try {
-      const saved = localStorage.getItem('otto_site_content_v3');
-      return saved ? JSON.parse(saved) : INITIAL_SITE_CONTENT;
-    } catch {
-      return INITIAL_SITE_CONTENT;
-    }
-  });
+  const [siteContent, setSiteContent] = useState(() => 
+    getInitialSync(STORAGE_KEYS.SITE_CONTENT, INITIAL_SITE_CONTENT)
+  );
 
-  // Persistence: Currency (default KSH matching the screenshot)
-  const [currency, setCurrency] = useState(() => {
-    try {
-      return localStorage.getItem('eliteride_currency_v1') || 'KSH';
-    } catch {
-      return 'KSH';
-    }
-  });
+  // Persistence: Currency
+  const [currency, setCurrency] = useState(() => 
+    getInitialSync(STORAGE_KEYS.CURRENCY, 'KSH')
+  );
 
-  // Wishlist
-  const [wishlist, setWishlist] = useState(() => {
-    try {
-      const saved = localStorage.getItem('eliteride_wishlist_v1');
-      return saved ? JSON.parse(saved) : ['premium-suv-prado', 'luxury-suv-lc300'];
-    } catch {
-      return [];
+  // Persistence: Wishlist
+  const [wishlist, setWishlist] = useState(() => 
+    getInitialSync(STORAGE_KEYS.WISHLIST, ['premium-suv-prado', 'luxury-suv-lc300'])
+  );
+
+  // Hydrate from IndexedDB on startup (loads high-res device photos & large catalogs safely)
+  useEffect(() => {
+    async function hydrateStorage() {
+      try {
+        const idbFleet = await loadFromIndexedDB(STORAGE_KEYS.FLEET);
+        if (idbFleet && Array.isArray(idbFleet) && idbFleet.length > 0) {
+          setFleet(idbFleet);
+        }
+        const idbBookings = await loadFromIndexedDB(STORAGE_KEYS.BOOKINGS);
+        if (idbBookings && Array.isArray(idbBookings)) {
+          setBookings(idbBookings);
+        }
+        const idbContent = await loadFromIndexedDB(STORAGE_KEYS.SITE_CONTENT);
+        if (idbContent && typeof idbContent === 'object') {
+          setSiteContent(idbContent);
+        }
+      } catch (err) {
+        console.warn('[Storage] Hydration check failed:', err);
+      }
     }
-  });
+    hydrateStorage();
+  }, []);
 
   // Admin Auth State (session)
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
@@ -98,45 +103,25 @@ export function AppProvider({ children }) {
     specialRequests: ''
   });
 
-  // Sync to localStorage
+  // Safe Dual-Layer Persistent Sync (IndexedDB + localStorage)
   useEffect(() => {
-    try {
-      localStorage.setItem('otto_fleet_v3', JSON.stringify(fleet));
-    } catch (e) {
-      console.error('Failed to sync fleet:', e);
-    }
+    savePersistent(STORAGE_KEYS.FLEET, fleet);
   }, [fleet]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('otto_bookings_v2', JSON.stringify(bookings));
-    } catch (e) {
-      console.error('Failed to sync bookings:', e);
-    }
+    savePersistent(STORAGE_KEYS.BOOKINGS, bookings);
   }, [bookings]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('otto_site_content_v3', JSON.stringify(siteContent));
-    } catch (e) {
-      console.error('Failed to sync site content:', e);
-    }
+    savePersistent(STORAGE_KEYS.SITE_CONTENT, siteContent);
   }, [siteContent]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('otto_currency_v2', currency);
-    } catch (e) {
-      console.error('Failed to sync currency:', e);
-    }
+    savePersistent(STORAGE_KEYS.CURRENCY, currency);
   }, [currency]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('otto_wishlist_v2', JSON.stringify(wishlist));
-    } catch (e) {
-      console.error('Failed to sync wishlist:', e);
-    }
+    savePersistent(STORAGE_KEYS.WISHLIST, wishlist);
   }, [wishlist]);
 
   // Price conversion helper (Supports KSh as prominent, USD, EUR, GBP, AED)
@@ -268,14 +253,42 @@ export function AppProvider({ children }) {
     showToast('Website content updated live!', 'success');
   };
 
-  const resetToDefaults = () => {
+  const resetToDefaults = async () => {
     setFleet(INITIAL_CARS);
     setBookings(INITIAL_BOOKINGS);
     setSiteContent(INITIAL_SITE_CONTENT);
-    localStorage.removeItem('otto_fleet_v2');
-    localStorage.removeItem('otto_bookings_v2');
-    localStorage.removeItem('otto_site_content_v2');
-    showToast('All fleet and site content reset to Otto demo defaults.', 'gold');
+    try {
+      localStorage.removeItem(STORAGE_KEYS.FLEET);
+      localStorage.removeItem(STORAGE_KEYS.BOOKINGS);
+      localStorage.removeItem(STORAGE_KEYS.SITE_CONTENT);
+      localStorage.removeItem('otto_fleet_v3');
+      localStorage.removeItem('otto_fleet_v2');
+      await savePersistent(STORAGE_KEYS.FLEET, INITIAL_CARS);
+      await savePersistent(STORAGE_KEYS.BOOKINGS, INITIAL_BOOKINGS);
+      await savePersistent(STORAGE_KEYS.SITE_CONTENT, INITIAL_SITE_CONTENT);
+    } catch {}
+    showToast('All fleet and site content reset to Otto defaults.', 'gold');
+  };
+
+  const downloadInitialDataJS = () => {
+    const fileContent = `// Otto / EliteRide Master Fleet Catalog & Configuration
+// Generated from Admin Control Center
+export const CURRENCY_RATES = ${JSON.stringify(CURRENCY_RATES, null, 2)};
+
+export const INITIAL_CARS = ${JSON.stringify(fleet, null, 2)};
+
+export const INITIAL_BOOKINGS = ${JSON.stringify(bookings, null, 2)};
+`;
+    const blob = new Blob([fileContent], { type: 'text/javascript;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'initialData.js';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('Downloaded updated initialData.js codebase file!', 'success');
   };
 
   const exportBackupJSON = () => {
@@ -347,7 +360,8 @@ export function AppProvider({ children }) {
         updateSiteContent,
         resetToDefaults,
         exportBackupJSON,
-        importBackupJSON
+        importBackupJSON,
+        downloadInitialDataJS
       }}
     >
       {children}

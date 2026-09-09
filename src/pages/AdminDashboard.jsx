@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { CATEGORIES, BRANDS } from '../data/initialData';
+import { compressImageFile } from '../utils/storage';
 import { 
   Shield, 
   Car, 
@@ -28,7 +29,8 @@ import {
   Image as ImageIcon,
   CheckCircle2,
   AlertCircle,
-  UploadCloud
+  UploadCloud,
+  Code2
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -51,6 +53,7 @@ export default function AdminDashboard() {
     resetToDefaults, 
     exportBackupJSON, 
     importBackupJSON, 
+    downloadInitialDataJS,
     navigateTo, 
     showToast 
   } = useApp();
@@ -184,29 +187,30 @@ export default function AdminDashboard() {
     setIsCarModalOpen(false);
   };
 
-  // Device File Upload Handler (FileReader to Data URL)
+  // Device File Upload Handler (Auto-compressed to web format)
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    files.forEach(file => {
+    files.forEach(async (file) => {
       if (!file.type.startsWith('image/')) {
         showToast('Please select valid image files.', 'error');
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const resultUrl = event.target?.result;
-        if (resultUrl) {
-          setCarFormData(prev => ({
-            ...prev,
-            images: [...prev.images, resultUrl.toString()]
-          }));
-          showToast(`Photo "${file.name}" uploaded successfully from your device!`, 'success');
-        }
-      };
-      reader.readAsDataURL(file);
+      try {
+        showToast(`Optimizing "${file.name}"...`, 'info');
+        // Resizes heavy camera photo to max 1280px with clean compression (~80KB)
+        const optimizedDataUrl = await compressImageFile(file, 1280, 0.82);
+        setCarFormData(prev => ({
+          ...prev,
+          images: [...prev.images, optimizedDataUrl]
+        }));
+        showToast(`Photo "${file.name}" uploaded and optimized!`, 'success');
+      } catch (err) {
+        console.error('Image compression error:', err);
+        showToast(`Failed to process "${file.name}".`, 'error');
+      }
     });
 
     // Reset input value so same files can be re-selected if needed
@@ -1084,16 +1088,25 @@ export default function AdminDashboard() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <button
+                onClick={downloadInitialDataJS}
+                className="btn-otto-primary py-3.5 px-4 text-xs uppercase flex items-center justify-center gap-2 shadow-md cursor-pointer bg-emerald-600 hover:bg-emerald-700"
+                title="Download updated initialData.js to permanently bake changes into the website repository"
+              >
+                <Code2 className="w-4 h-4" />
+                <span>Save to Codebase</span>
+              </button>
+
               <button
                 onClick={exportBackupJSON}
-                className="btn-otto-primary py-3.5 px-6 text-xs uppercase flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                className="py-3.5 px-4 rounded-full border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center justify-center gap-2 shadow-sm cursor-pointer transition-colors"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-4 h-4 text-blue-600" />
                 <span>Export Backup JSON</span>
               </button>
 
-              <label className="px-6 py-3.5 rounded-full border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center justify-center gap-2 cursor-pointer transition-colors">
+              <label className="px-4 py-3.5 rounded-full border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center justify-center gap-2 cursor-pointer transition-colors">
                 <Upload className="w-4 h-4 text-blue-600" />
                 <span>Import Backup JSON</span>
                 <input
@@ -1114,6 +1127,17 @@ export default function AdminDashboard() {
                   }}
                 />
               </label>
+            </div>
+
+            {/* Storage Protection Notice */}
+            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-left space-y-1 text-xs text-emerald-900">
+              <div className="font-bold flex items-center gap-1.5 text-emerald-800">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Persistent Dual-Layer Storage (IndexedDB + LocalStorage) Active</span>
+              </div>
+              <p className="text-emerald-700 leading-relaxed">
+                Your pricing adjustments, vehicle availability, and uploaded photos are automatically saved to persistent IndexedDB with smart image compression so they will never disappear on reload.
+              </p>
             </div>
 
             <div className="pt-6 border-t border-slate-100">
