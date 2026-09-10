@@ -675,7 +675,7 @@ export const CITIES_WE_SERVE = [
 
 export const INITIAL_BOOKINGS = [
   {
-    id: "ELITE-89241",
+    id: "OTTO-89241",
     createdAt: "2026-09-07T14:30:00Z",
     carId: "premium-suv-prado",
     carName: "Toyota Prado TX/TXL",

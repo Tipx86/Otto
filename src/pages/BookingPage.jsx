@@ -172,7 +172,7 @@ export default function BookingPage() {
       ? calculation.addOns.map(a => `  • ${a.name} (${formatPrice(Math.round(a.price / 128.5), a.price * (a.days || 1))})`).join('\n')
       : '  • Standard Comprehensive Cover';
 
-    return `*NEW ELITERIDE BOOKING REQUEST* 🚗✨
+    return `*NEW OTTORENTAL BOOKING REQUEST* 🚗✨
 ━━━━━━━━━━━━━━━━━━━━━
 🔖 *Booking Ref:* ${bookingObj.id}
 🚘 *Vehicle:* ${selectedCar.name} (${selectedCar.category})
@@ -195,7 +195,7 @@ ${specialRequests ? `• *Special Requests:* ${specialRequests}\n` : ''}
 • *Kenya Shillings:* KSh ${calculation.grandTotalKsh.toLocaleString()}
 • *USD Equivalent:* $${calculation.grandTotalUSD}
 ━━━━━━━━━━━━━━━━━━━━━
-Hello EliteRide Concierge, I have submitted this reservation and would like to confirm vehicle availability and handover.`;
+Hello OTTORENTAL Concierge, I have submitted this reservation and would like to confirm vehicle availability and handover.`;
   };
 
   const handleSubmitBooking = (e) => {
@@ -725,7 +725,7 @@ Hello EliteRide Concierge, I have submitted this reservation and would like to c
 
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2 print:hidden">
               <a
-                href={`https://wa.me/${(siteContent.brand?.whatsapp || '254119317161').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(confirmedBooking ? getFormattedWhatsAppMessage(confirmedBooking) : 'Hello EliteRide')}`}
+                href={`https://wa.me/${(siteContent.brand?.whatsapp || '254119317161').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(confirmedBooking ? getFormattedWhatsAppMessage(confirmedBooking) : 'Hello OTTORENTAL')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="py-3 px-6 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs uppercase flex items-center gap-2 shadow-md transition-all"

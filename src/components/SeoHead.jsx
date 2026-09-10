@@ -8,7 +8,7 @@ import { useEffect } from 'react';
  */
 
 const SITE_URL = 'https://ottorental.com';
-const BRAND_NAME = 'EliteRide';
+const BRAND_NAME = 'OTTORENTAL';
 const PHONE = '+254 119 317161';
 const EMAIL = 'reservations@ottorental.com';
 const WHATSAPP = '+254 119 317161';

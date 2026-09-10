@@ -1,4 +1,4 @@
-/* EliteRide - Modern Mobile-First Premium Aesthetic Design System */
+/* OTTORENTAL - Modern Mobile-First Premium Aesthetic Design System */
 
 :root {
   --bg-page: #f8fafc;
@@ -64,7 +64,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
 
-/* EliteRide Search Bar Capsule - Mobile Responsive */
+/* OTTORENTAL Search Bar Capsule - Mobile Responsive */
 .search-capsule {
   background: #ffffff;
   border-radius: 20px;

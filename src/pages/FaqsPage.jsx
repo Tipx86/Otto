@@ -107,7 +107,7 @@ export default function FaqsPage() {
           <p className="text-xs text-slate-500">Our customer team is on standby 24/7 to assist with your rental itinerary.</p>
           <div className="pt-1 flex justify-center gap-3">
             <a
-              href={`https://wa.me/${siteContent.brand.whatsapp}?text=Hello%20EliteRide`}
+              href={`https://wa.me/${siteContent.brand.whatsapp}?text=Hello%20OTTORENTAL`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase shadow-sm"

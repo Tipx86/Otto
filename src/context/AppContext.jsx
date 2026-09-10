@@ -332,7 +332,7 @@ export function AppProvider({ children }) {
 
   // Bookings CRUD
   const addBooking = (newBookingData) => {
-    const refCode = `ELITE-${Math.floor(10000 + Math.random() * 90000)}`;
+    const refCode = `OTTO-${Math.floor(10000 + Math.random() * 90000)}`;
     const fullBooking = {
       id: refCode,
       createdAt: new Date().toISOString(),
@@ -409,7 +409,7 @@ export function AppProvider({ children }) {
   };
 
   const downloadInitialDataJS = () => {
-    const fileContent = `// Otto / EliteRide Master Fleet Catalog & Configuration
+    const fileContent = `// Otto / OTTORENTAL Master Fleet Catalog & Configuration
 // Generated from Admin Control Center
 export const CURRENCY_RATES = ${JSON.stringify(CURRENCY_RATES, null, 2)};
 

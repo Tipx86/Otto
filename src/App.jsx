@@ -42,8 +42,8 @@ function MainRouter() {
     })();
 
     const pageTitle = selectedCar 
-      ? `${selectedCar.name} | EliteRide Kenya`
-      : (document.title || `EliteRide - ${currentPage}`);
+      ? `${selectedCar.name} | OTTORENTAL Kenya`
+      : (document.title || `OTTORENTAL - ${currentPage}`);
 
     const trackingKey = `${routePath}::${pageTitle}`;
     if (lastTrackedRef.current !== trackingKey) {

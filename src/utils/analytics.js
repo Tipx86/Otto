@@ -1,6 +1,6 @@
 /**
  * Google Analytics 4 (GA4) Integration
- * Production-ready utility for Otto / EliteRide
+ * Production-ready utility for Otto / OTTORENTAL
  *
  * Requirements fulfilled:
  * - Uses environment variable VITE_GA_MEASUREMENT_ID

@@ -33,7 +33,7 @@ export default function ContactPage() {
     e.preventDefault();
     trackGenerateLead(formData.serviceInterest || 'General Inquiry', 'Contact Page Form');
     setSubmitted(true);
-    showToast('Inquiry submitted. An EliteRide concierge will contact you shortly.', 'success');
+    showToast('Inquiry submitted. An OTTORENTAL concierge will contact you shortly.', 'success');
   };
 
   return (
@@ -74,7 +74,7 @@ export default function ContactPage() {
                   Inquiry Logged Successfully
                 </h3>
                 <p className="text-xs text-slate-600 max-w-md mx-auto">
-                  Thank you, <strong className="text-slate-900">{formData.name}</strong>. An EliteRide concierge has received your request and will connect with you immediately via phone or WhatsApp.
+                  Thank you, <strong className="text-slate-900">{formData.name}</strong>. An OTTORENTAL concierge has received your request and will connect with you immediately via phone or WhatsApp.
                 </p>
                 <button
                   onClick={() => {
@@ -143,7 +143,7 @@ export default function ContactPage() {
                     >
                       <option value="Car Rental Inquiry">Vehicle Rental Inquiry</option>
                       <option value="Safari Expedition">Masai Mara / Safari 4x4 Booking</option>
-                      <option value="Corporate Fleet Account">EliteRide for Business Corporate Account</option>
+                      <option value="Corporate Fleet Account">OTTORENTAL for Business Corporate Account</option>
                       <option value="Operator Listing">Become a Verified Operator (List Fleet)</option>
                       <option value="Airport Handover">Airport VIP Terminal Handover</option>
                     </select>
@@ -171,7 +171,7 @@ export default function ContactPage() {
                     className="w-full btn-otto-primary py-3 text-xs uppercase tracking-wider font-extrabold flex items-center justify-center gap-2 shadow-md cursor-pointer"
                   >
                     <Send className="w-4 h-4" />
-                    <span>Transmit Inquiry to EliteRide Concierge</span>
+                    <span>Transmit Inquiry to OTTORENTAL Concierge</span>
                   </button>
                 </div>
               </form>
@@ -215,7 +215,7 @@ export default function ContactPage() {
               {/* WhatsApp Button */}
               <div className="pt-2">
                 <a
-                  href={`https://wa.me/${siteContent.brand.whatsapp}?text=Hello%20EliteRide%20Concierge`}
+                  href={`https://wa.me/${siteContent.brand.whatsapp}?text=Hello%20OTTORENTAL%20Concierge`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase transition-colors shadow-sm"

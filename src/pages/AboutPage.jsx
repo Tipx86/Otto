@@ -22,7 +22,7 @@ export default function AboutPage() {
         {/* Editorial Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider">
-            About EliteRide
+            About OTTORENTAL
           </span>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
             Kenya's Premier Self-Drive & Chauffeured Rental Marketplace
@@ -36,7 +36,7 @@ export default function AboutPage() {
         <div className="relative rounded-3xl overflow-hidden aspect-[21/9] bg-slate-900 shadow-md">
           <img
             src="https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1800&q=85"
-            alt="EliteRide Fleet in Masai Mara"
+            alt="OTTORENTAL Fleet in Masai Mara"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
@@ -57,7 +57,7 @@ export default function AboutPage() {
         {/* Pillars Grid */}
         <div className="space-y-6">
           <div className="text-center max-w-2xl mx-auto space-y-1">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Why Rent with EliteRide?</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Why Rent with OTTORENTAL?</h2>
             <p className="text-xs sm:text-sm text-slate-500">Built for seamless mobility, trust, and transparent rates.</p>
           </div>
 
@@ -104,7 +104,7 @@ export default function AboutPage() {
         <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-sm text-center space-y-5 max-w-3xl mx-auto">
           <h3 className="text-2xl font-extrabold text-slate-900">Ready to hit the road?</h3>
           <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto">
-            From city runabouts in Nairobi to 4x4 safari Land Cruisers for the Masai Mara, EliteRide has the perfect vehicle for your journey.
+            From city runabouts in Nairobi to 4x4 safari Land Cruisers for the Masai Mara, OTTORENTAL has the perfect vehicle for your journey.
           </p>
           <div className="flex justify-center gap-3 pt-2">
             <button

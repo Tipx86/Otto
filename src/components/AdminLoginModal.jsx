@@ -37,7 +37,7 @@ export default function AdminLoginModal({ isOpen, onClose }) {
             <Shield className="w-7 h-7" />
           </div>
           <h2 className="text-xl font-extrabold tracking-tight text-slate-900">
-            EliteRide Admin Portal
+            OTTORENTAL Admin Portal
           </h2>
           <p className="text-xs text-slate-500 mt-1">
             Enter authorized security PIN to manage vehicles, pricing, availability & website content.

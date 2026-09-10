@@ -44,7 +44,7 @@ export default function Footer() {
               </p>
               <div className="pt-2 flex items-center gap-3">
                 <a
-                  href={`https://wa.me/${siteContent.brand.whatsapp}?text=Hello%20EliteRide`}
+                  href={`https://wa.me/${siteContent.brand.whatsapp}?text=Hello%20OTTORENTAL`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 font-bold"
@@ -90,8 +90,8 @@ export default function Footer() {
               </h4>
               <ul className="space-y-2">
                 <li><button onClick={() => navigateTo('contact')} className="hover:text-blue-600 transition-colors">Become an Operator</button></li>
-                <li><button onClick={() => navigateTo('about')} className="hover:text-blue-600 transition-colors">EliteRide for Business</button></li>
-                <li><button onClick={() => navigateTo('about')} className="hover:text-blue-600 transition-colors">Earn with EliteRide</button></li>
+                <li><button onClick={() => navigateTo('about')} className="hover:text-blue-600 transition-colors">OTTORENTAL for Business</button></li>
+                <li><button onClick={() => navigateTo('about')} className="hover:text-blue-600 transition-colors">Earn with OTTORENTAL</button></li>
                 <li><button onClick={() => navigateTo('faqs')} className="hover:text-blue-600 transition-colors">Rental FAQs & Terms</button></li>
                 <li><button onClick={() => navigateTo('contact')} className="hover:text-blue-600 transition-colors">Concierge Desk</button></li>
               </ul>
@@ -102,7 +102,7 @@ export default function Footer() {
           {/* Bottom Bar */}
           <div className="pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-400 text-xs">
             <p>
-              © {new Date().getFullYear()} {siteContent.brand.name || 'EliteRide'}. All rights reserved. Registered rental marketplace & operator logistics.
+              © {new Date().getFullYear()} {siteContent.brand.name || 'OTTORENTAL'}. All rights reserved. Registered rental marketplace & operator logistics.
             </p>
 
             <div className="flex items-center gap-4">

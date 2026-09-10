@@ -1,11 +1,11 @@
 export const INITIAL_SITE_CONTENT = {
   brand: {
-    name: "EliteRide",
+    name: "OttoRental",
     tagline: "Car & Safari Rentals Across Kenya & Worldwide",
     phone: "+254 119 317161",
     internationalPhone: "+254 119 317161",
     whatsapp: "254119317161",
-    email: "hello@eliteride.co.ke",
+    email: "hello@OttoRental.co.ke",
     address: "Westlands Commercial Center, Ring Road Parklands, Nairobi, Kenya",
     operatingHours: "24/7 Handover, Airport Pickup & Roadside Support",
     securityPin: "8888"
@@ -49,11 +49,11 @@ export const INITIAL_SITE_CONTENT = {
       name: "David O.",
       role: "Operations, Nairobi",
       rating: 5,
-      quote: "We use EliteRide for all our client pickups. The driver was on time, smartly dressed, and the whole thing was billed to our company account. No cash, no fuss."
+      quote: "We use OttoRental for all our client pickups. The driver was on time, smartly dressed, and the whole thing was billed to our company account. No cash, no fuss."
     }
   ],
   earnSection: {
-    badge: "EARN WITH ELITERIDE",
+    badge: "EARN WITH OttoRental",
     title: "People already ask you where to rent a car. Get paid for the answer.",
     description: "Share your link, your client books a verified car at the normal price, and you keep 8 percent of the rental total. Free to join, no targets, paid by M-Pesa after the trip.",
     cta1: "Start earning",
@@ -80,13 +80,13 @@ export const INITIAL_SITE_CONTENT = {
   operatorSection: {
     badge: "BECOME AN OPERATOR",
     title: "Run a rental or tour business? Meet GoBookKit.",
-    description: "GoBookKit is the operating system for auto-rental and tour operators: bookings, fleet management, digital contracts, M-Pesa and card payments, and an AI booking agent in one place. List your fleet and get discovered by every renter on EliteRide.",
+    description: "GoBookKit is the operating system for auto-rental and tour operators: bookings, fleet management, digital contracts, M-Pesa and card payments, and an AI booking agent in one place. List your fleet and get discovered by every renter on OttoRental.",
     cta1: "Explore GoBookKit",
     cta2: "List your fleet",
     cards: [
       {
         title: "Car rental operators",
-        text: "Manage your fleet, view bookings, sign digital contracts, get paid by M-Pesa, then sell inventory days on the EliteRide Marketplace."
+        text: "Manage your fleet, view bookings, sign digital contracts, get paid by M-Pesa, then sell inventory days on the OttoRental Marketplace."
       },
       {
         title: "Tour and safari operators",
@@ -95,7 +95,7 @@ export const INITIAL_SITE_CONTENT = {
     ]
   },
   businessSection: {
-    badge: "ELITERIDE FOR BUSINESS",
+    badge: "OttoRental FOR BUSINESS",
     title: "Every trip your team takes, on one account",
     description: "Client pickups, staff travel, site visits and airport runs across Kenya. Your travel desk books on behalf of colleagues, and finance gets one monthly invoice instead of a folder of receipts.",
     cta1: "Talk to sales",

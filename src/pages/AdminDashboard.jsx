@@ -285,7 +285,7 @@ export default function AdminDashboard() {
 
           <div>
             <h1 className="font-extrabold text-2xl text-slate-900 tracking-tight">
-              EliteRide Admin Portal
+              OTTORENTAL Admin Portal
             </h1>
             <p className="text-xs text-slate-500 mt-1">
               Please enter your security PIN code to manage fleet inventory, upload device photos, manage availability, and edit content.
@@ -361,7 +361,7 @@ export default function AdminDashboard() {
                   Local Device Storage
                 </span>
               )}
-              <span className="text-xs text-slate-500">EliteRide Fleet & CMS</span>
+              <span className="text-xs text-slate-500">OTTORENTAL Fleet & CMS</span>
             </div>
             <h1 className="font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight mt-1">
               Admin Control Center
@@ -1625,7 +1625,7 @@ export default function AdminDashboard() {
 
               <div className="flex items-center justify-end gap-3 pt-2">
                 <a
-                  href={`https://wa.me/${viewingBooking.customer.phone.replace(/[^0-9]/g, '')}?text=Hello%20${viewingBooking.customer.fullName}%2C%20this%20is%20EliteRide%20regarding%20booking%20${viewingBooking.id}.`}
+                  href={`https://wa.me/${viewingBooking.customer.phone.replace(/[^0-9]/g, '')}?text=Hello%20${viewingBooking.customer.fullName}%2C%20this%20is%20OTTORENTAL%20regarding%20booking%20${viewingBooking.id}.`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-otto-primary text-xs py-2.5 px-5 uppercase flex items-center gap-1.5"
