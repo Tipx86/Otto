@@ -369,7 +369,7 @@ export default function CarDetailsPage() {
                     />
                     <span className="font-semibold text-slate-800">Add Professional Chauffeur</span>
                   </div>
-                  <span className="text-[11px] font-bold text-blue-600">+ KSh 3,500/day</span>
+                  <span className="text-[11px] font-bold text-blue-600">+ KSh 2,500/day</span>
                 </label>
 
                 {/* Zero Excess Protection */}
@@ -396,13 +396,13 @@ export default function CarDetailsPage() {
                 {calculation.addOns > 0 && (
                   <div className="flex items-center justify-between text-slate-600">
                     <span>Add-ons:</span>
-                    <span className="font-semibold">{formatPrice(calculation.addOns, calculation.days * (chauffeurIncluded ? 3500 : 0) + (fullProtection ? calculation.days * 1200 : 0))}</span>
+                    <span className="font-semibold">{formatPrice(calculation.addOns, calculation.days * (chauffeurIncluded ? 2500 : 0) + (fullProtection ? calculation.days * 1200 : 0))}</span>
                   </div>
                 )}
                 <div className="pt-2 border-t border-slate-200 flex items-baseline justify-between text-sm font-bold text-slate-900">
                   <span>Estimated Total:</span>
                   <span className="text-xl font-extrabold text-blue-600">
-                    {formatPrice(calculation.grandTotal, calculation.days * (car.kshPrice || 4500) + (chauffeurIncluded ? calculation.days * 3500 : 0) + (fullProtection ? calculation.days * 1200 : 0))}
+                    {formatPrice(calculation.grandTotal, calculation.days * (car.kshPrice || 4500) + (chauffeurIncluded ? calculation.days * 2500 : 0) + (fullProtection ? calculation.days * 1200 : 0))}
                   </span>
                 </div>
               </div>
