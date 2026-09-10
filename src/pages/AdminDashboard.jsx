@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { CATEGORIES, BRANDS } from '../data/initialData';
-import { compressImageFile } from '../utils/storage';
+import { compressImageFile, uploadImageToCloud } from '../utils/storage';
 import { 
   Shield, 
   Car, 
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
     setIsCarModalOpen(false);
   };
 
-  // Device File Upload Handler (Auto-compressed to web format)
+  // Device File Upload Handler (Auto-compressed & Cloud CDN Ready)
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
@@ -204,16 +204,21 @@ export default function AdminDashboard() {
       }
 
       try {
-        showToast(`Optimizing "${file.name}"...`, 'info');
-        // Resizes heavy camera photo to max 1280px with clean compression (~80KB)
-        const optimizedDataUrl = await compressImageFile(file, 1280, 0.82);
+        showToast(`Processing & uploading "${file.name}"...`, 'info');
+        const uploadResult = await uploadImageToCloud(file, file.name);
+
         setCarFormData(prev => ({
           ...prev,
-          images: [...prev.images, optimizedDataUrl]
+          images: [...prev.images, uploadResult.url]
         }));
-        showToast(`Photo "${file.name}" uploaded and optimized!`, 'success');
+
+        if (uploadResult.source === 'cloud') {
+          showToast(`Photo "${file.name}" saved to global Blob CDN!`, 'success');
+        } else {
+          showToast(`Photo "${file.name}" optimized & saved locally!`, 'success');
+        }
       } catch (err) {
-        console.error('Image compression error:', err);
+        console.error('Image upload error:', err);
         showToast(`Failed to process "${file.name}".`, 'error');
       }
     });
@@ -1218,20 +1223,11 @@ export default function AdminDashboard() {
             </div>
 
             {/* Cloud Status Card */}
-            <div className={`rounded-2xl p-5 border text-left space-y-3 ${
-              cloudSyncStatus.configured 
-                ? 'bg-blue-50/70 border-blue-200 text-blue-950' 
-                : 'bg-amber-50/70 border-amber-200 text-amber-950'
-            }`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${cloudSyncStatus.configured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
-                  <span className="font-extrabold text-sm uppercase tracking-wide">
-                    {cloudSyncStatus.configured 
-                      ? 'Vercel KV Cloud Database Connected' 
-                      : 'Running in Local Browser Storage'}
-                  </span>
-                </div>
+            <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 text-left space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                <span className="font-extrabold text-sm text-slate-900 uppercase tracking-wide">
+                  Cloud Infrastructure Status
+                </span>
                 {cloudSyncStatus.lastSync && (
                   <span className="text-[11px] font-mono text-slate-500">
                     Last synced: {cloudSyncStatus.lastSync}
@@ -1239,33 +1235,68 @@ export default function AdminDashboard() {
                 )}
               </div>
 
-              <p className="text-xs leading-relaxed text-slate-700">
-                {cloudSyncStatus.configured ? (
-                  <>
-                    ✅ <strong>Active Multi-Device Sync:</strong> Any vehicle, price change, or photo you save is automatically written to your Vercel KV cloud database. When you or any client opens the website on a new device, it loads your latest updates immediately.
-                  </>
-                ) : (
-                  <>
-                    ⚠️ <strong>Currently in Local Mode:</strong> Your updates are safely stored in this browser via IndexedDB. To make changes reflect on <em>all new devices</em> (phones, iPads, other laptops), connect Vercel KV in your Vercel Project.
-                  </>
-                )}
-              </p>
+              {/* Status Grid: Database (KV) and Media Storage (Blob) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* 1. Database (KV) */}
+                <div className={`p-4 rounded-2xl border ${
+                  cloudSyncStatus.configured 
+                    ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950' 
+                    : 'bg-amber-50/80 border-amber-200 text-amber-950'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2.5 h-2.5 rounded-full ${cloudSyncStatus.configured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
+                    <span className="font-bold text-xs uppercase">
+                      Vercel KV (Database)
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1.5 leading-relaxed">
+                    {cloudSyncStatus.configured 
+                      ? '✅ Connected — Fleet, bookings, pricing & text content sync across devices.' 
+                      : '⚠️ Offline — Running locally in browser IndexedDB.'}
+                  </p>
+                </div>
 
-              {!cloudSyncStatus.configured && (
-                <div className="bg-white/80 p-3.5 rounded-xl border border-amber-200/80 text-xs space-y-2 text-slate-800">
-                  <span className="font-bold block text-amber-900">
-                    How to enable Cross-Device Sync on Vercel (1 Minute):
+                {/* 2. Media (Blob) */}
+                <div className={`p-4 rounded-2xl border ${
+                  cloudSyncStatus.blobConfigured 
+                    ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950' 
+                    : 'bg-amber-50/80 border-amber-200 text-amber-950'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2.5 h-2.5 rounded-full ${cloudSyncStatus.blobConfigured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
+                    <span className="font-bold text-xs uppercase">
+                      Vercel Blob (Media CDN)
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1.5 leading-relaxed">
+                    {cloudSyncStatus.blobConfigured 
+                      ? '✅ Connected — Photos hosted on high-speed global CDN with unlimited capacity.' 
+                      : '⚠️ Not Connected — Device photos are compressed and stored locally.'}
+                  </p>
+                </div>
+              </div>
+
+              {/* How to activate guide if either is missing */}
+              {(!cloudSyncStatus.configured || !cloudSyncStatus.blobConfigured) && (
+                <div className="bg-white p-4 rounded-2xl border border-slate-200 text-xs space-y-2 text-slate-800">
+                  <span className="font-bold block text-slate-900">
+                    How to enable full Cloud Sync & Photo Hosting on Vercel:
                   </span>
-                  <ol className="list-decimal list-inside space-y-1 text-[11px] text-slate-600">
-                    <li>Go to your project on <a href="https://vercel.com" target="_blank" rel="noreferrer" className="underline font-bold text-blue-600">vercel.com</a></li>
+                  <ol className="list-decimal list-inside space-y-1.5 text-[11px] text-slate-600">
+                    <li>Open your project at <a href="https://vercel.com" target="_blank" rel="noreferrer" className="underline font-bold text-blue-600">vercel.com</a></li>
                     <li>Click the <strong>Storage</strong> tab in the top navigation</li>
-                    <li>Click <strong>Connect Database</strong> and choose <strong>KV / Upstash Redis</strong></li>
-                    <li>Click <strong>Connect</strong> and accept the defaults — that's it!</li>
+                    {!cloudSyncStatus.configured && (
+                      <li>Click <strong>Connect Database</strong> → choose <strong>KV</strong> (for fleet data & bookings)</li>
+                    )}
+                    {!cloudSyncStatus.blobConfigured && (
+                      <li>Click <strong>Connect Database</strong> (or Create Database) → choose <strong>Blob</strong> (for photos & media)</li>
+                    )}
+                    <li>Redeploy or push code to apply the environment variables automatically.</li>
                   </ol>
                 </div>
               )}
 
-              <div className="pt-1 flex items-center gap-3">
+              <div className="pt-1 flex flex-wrap items-center gap-3">
                 <button
                   type="button"
                   onClick={() => syncFleetToCloud()}
@@ -1273,7 +1304,7 @@ export default function AdminDashboard() {
                   className="btn-otto-primary text-xs py-2.5 px-5 shadow-sm inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <UploadCloud className={`w-4 h-4 ${cloudSyncStatus.syncing ? 'animate-spin' : ''}`} />
-                  <span>{cloudSyncStatus.syncing ? 'Syncing to Cloud...' : 'Push Local Catalog to Cloud Now'}</span>
+                  <span>{cloudSyncStatus.syncing ? 'Syncing to Cloud...' : 'Sync Fleet & Photos to Cloud Now'}</span>
                 </button>
               </div>
             </div>

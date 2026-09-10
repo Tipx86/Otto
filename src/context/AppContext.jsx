@@ -75,6 +75,7 @@ export function AppProvider({ children }) {
   // Cloud Sync Status
   const [cloudSyncStatus, setCloudSyncStatus] = useState({
     configured: false,
+    blobConfigured: false,
     source: 'local',
     lastSync: null,
     syncing: false
@@ -116,6 +117,7 @@ export function AppProvider({ children }) {
             setCloudSyncStatus(prev => ({
               ...prev,
               configured: Boolean(json.configured),
+              blobConfigured: Boolean(json.blobConfigured),
               source: json.source || 'local'
             }));
 
@@ -242,17 +244,28 @@ export function AppProvider({ children }) {
       });
       const json = await res.json();
       if (json.configured) {
+        if (json.data && Array.isArray(json.data)) {
+          setFleet(json.data);
+          await savePersistent(STORAGE_KEYS.FLEET, json.data);
+        }
         setCloudSyncStatus({
           configured: true,
+          blobConfigured: Boolean(json.blobConfigured),
           source: 'cloud',
           lastSync: new Date().toLocaleTimeString(),
           syncing: false
         });
-        showToast('Fleet successfully synced across all devices via Vercel KV!', 'success');
+        showToast(
+          json.blobConfigured 
+            ? 'Fleet & HD photos successfully synced to Cloud & Blob CDN!' 
+            : 'Fleet synced to Vercel KV database!', 
+          'success'
+        );
         return true;
       } else {
         setCloudSyncStatus({
           configured: false,
+          blobConfigured: Boolean(json.blobConfigured),
           source: 'local',
           lastSync: null,
           syncing: false
@@ -277,6 +290,10 @@ export function AppProvider({ children }) {
       });
       const json = await res.json();
       if (json.configured) {
+        if (json.data && typeof json.data === 'object') {
+          setSiteContent(json.data);
+          await savePersistent(STORAGE_KEYS.SITE_CONTENT, json.data);
+        }
         showToast('Website content synced to cloud database!', 'success');
       }
     } catch (err) {
