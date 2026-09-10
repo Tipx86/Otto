@@ -50,7 +50,7 @@ export async function dbSaveFleet(fleetArray) {
     return { success: true, data: safeFleet };
   } catch (e) {
     console.error('[Supabase] saveFleet:', e.message);
-    return { success: false };
+    return { success: false, error: e.message };
   }
 }
 
@@ -78,10 +78,10 @@ export async function dbSaveContent(contentObj) {
       .from('site_content')
       .upsert({ id: 'main', data: contentObj, updated_at: new Date().toISOString() }, { onConflict: 'id' });
     if (error) throw error;
-    return true;
+    return { success: true };
   } catch (e) {
     console.error('[Supabase] saveContent:', e.message);
-    return false;
+    return { success: false, error: e.message };
   }
 }
 

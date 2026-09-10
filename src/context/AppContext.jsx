@@ -266,12 +266,13 @@ export function AppProvider({ children }) {
         return true;
       } else {
         setCloudSyncStatus(prev => ({ ...prev, syncing: false, source: 'local' }));
-        showToast('Saved locally. Check Supabase connection.', 'info');
+        showToast(result.error ? `Sync error: ${result.error}` : 'Saved locally. Check Supabase connection.', 'error');
         return false;
       }
     } catch (err) {
       setCloudSyncStatus(prev => ({ ...prev, syncing: false }));
       console.warn('[Supabase Sync] Failed:', err);
+      showToast(`Sync failed: ${err.message || 'Unknown error'}`, 'error');
       return false;
     }
   };
@@ -279,11 +280,12 @@ export function AppProvider({ children }) {
   const syncContentToCloud = async (overrideContent = null) => {
     const dataToSend = overrideContent || siteContent;
     try {
-      const ok = await dbSaveContent(dataToSend);
-      if (ok) {
+      const res = await dbSaveContent(dataToSend);
+      if (res.success) {
         showToast('Website content saved to Supabase!', 'success');
         return true;
       }
+      showToast(res.error ? `Content sync error: ${res.error}` : 'Content sync failed', 'error');
       return false;
     } catch (err) {
       console.warn('[Supabase Content Sync] Failed:', err);
@@ -301,7 +303,7 @@ export function AppProvider({ children }) {
       } else if (fleetOk) {
         showToast('✅ Fleet synced! Content sync had an issue.', 'gold');
       } else {
-        showToast('⚠️ Sync failed — add storage policy in Supabase then try again.', 'error');
+        // syncFleetToCloud already displayed the exact error toast
       }
     } finally {
       setCloudSyncStatus(prev => ({ ...prev, syncing: false }));
