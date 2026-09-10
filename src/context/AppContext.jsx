@@ -90,8 +90,10 @@ export function AppProvider({ children }) {
 
     async function hydrateStorageAndCloud() {
       // 1. Instant local IndexedDB hydration
+      // Keep refs to local data so we can compare timestamps with cloud
+      let idbFleet = null;
       try {
-        const idbFleet = await loadFromIndexedDB(STORAGE_KEYS.FLEET);
+        idbFleet = await loadFromIndexedDB(STORAGE_KEYS.FLEET);
         if (isMounted && idbFleet && Array.isArray(idbFleet) && idbFleet.length > 0) {
           setFleet(idbFleet);
         }
@@ -125,15 +127,29 @@ export function AppProvider({ children }) {
               source: json.source || 'local'
             }));
 
-            // If cloud has master inventory, sync to this device!
+            // Only use cloud data if cloud has data AND either:
+            // (a) no local data exists, OR
+            // (b) cloud timestamp is newer than the last known cloud sync timestamp
             if (json.source === 'cloud' && Array.isArray(json.data) && json.data.length > 0) {
-              setFleet(json.data);
-              await savePersistent(STORAGE_KEYS.FLEET, json.data);
-              setCloudSyncStatus(prev => ({
-                ...prev,
-                lastSync: new Date().toLocaleTimeString()
-              }));
+              const cloudTs = json.lastUpdated || 0;
+              // Read the timestamp of the last successful cloud sync we processed
+              const lastKnownCloudTs = Number(localStorage.getItem('otto_fleet_cloud_ts') || '0');
+              const localHasData = idbFleet && Array.isArray(idbFleet) && idbFleet.length > 0;
+
+              // Apply cloud data if: no local data, OR cloud has data we haven't applied yet
+              if (!localHasData || cloudTs > lastKnownCloudTs || cloudTs === 0) {
+                setFleet(json.data);
+                await savePersistent(STORAGE_KEYS.FLEET, json.data);
+                if (cloudTs > 0) {
+                  try { localStorage.setItem('otto_fleet_cloud_ts', String(cloudTs)); } catch {}
+                }
+                setCloudSyncStatus(prev => ({
+                  ...prev,
+                  lastSync: new Date().toLocaleTimeString()
+                }));
+              }
             }
+
           }
         }
 
@@ -256,9 +272,12 @@ export function AppProvider({ children }) {
       });
       const json = await res.json();
       if (json.configured) {
-        if (json.data && Array.isArray(json.data)) {
-          setFleet(json.data);
-          await savePersistent(STORAGE_KEYS.FLEET, json.data);
+        const returnedFleet = json.data && Array.isArray(json.data) ? json.data : dataToSend;
+        setFleet(returnedFleet);
+        await savePersistent(STORAGE_KEYS.FLEET, returnedFleet);
+        // Store the cloud's lastUpdated so we know next refresh that cloud is authoritative
+        if (json.lastUpdated) {
+          try { localStorage.setItem('otto_fleet_cloud_ts', String(json.lastUpdated)); } catch {}
         }
         setCloudSyncStatus({
           configured: true,

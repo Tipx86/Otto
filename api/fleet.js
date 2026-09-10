@@ -87,6 +87,19 @@ export default async function handler(req, res) {
         });
       }
 
+      const stored = await kv.get('otto:fleet_store');
+      if (stored && stored.data && Array.isArray(stored.data) && stored.data.length > 0) {
+        return res.status(200).json({
+          success: true,
+          configured: true,
+          blobConfigured,
+          source: 'cloud',
+          lastUpdated: stored.lastUpdated || 0,
+          data: stored.data
+        });
+      }
+
+      // Fallback: check old key format for backward compat
       const storedFleet = await kv.get('otto:fleet');
       if (storedFleet && Array.isArray(storedFleet) && storedFleet.length > 0) {
         return res.status(200).json({
@@ -94,6 +107,7 @@ export default async function handler(req, res) {
           configured: true,
           blobConfigured,
           source: 'cloud',
+          lastUpdated: 0,
           data: storedFleet
         });
       }
@@ -124,7 +138,11 @@ export default async function handler(req, res) {
 
       // Automatically convert any base64 images to permanent Blob URLs
       const cleanedFleet = await offloadBase64ImagesToBlob(fleet);
+      const lastUpdated = Date.now();
 
+      // Store with timestamp for staleness detection
+      await kv.set('otto:fleet_store', { data: cleanedFleet, lastUpdated });
+      // Also keep old key for backward compat
       await kv.set('otto:fleet', cleanedFleet);
       return res.status(200).json({
         success: true,
@@ -132,6 +150,7 @@ export default async function handler(req, res) {
         blobConfigured,
         message: 'Fleet synced to cloud database',
         count: cleanedFleet.length,
+        lastUpdated,
         data: cleanedFleet
       });
     }
