@@ -1,4 +1,4 @@
-import { kv, isKVConfigured } from './_kv.js';
+import { getKVClient, isKVConfigured } from './_kv.js';
 import { put } from '@vercel/blob';
 
 /**
@@ -71,11 +71,13 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  const kv = getKVClient();
   const blobConfigured = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+  const kvConfigured = isKVConfigured() && Boolean(kv);
 
   try {
     if (req.method === 'GET') {
-      if (!isKVConfigured() || !kv) {
+      if (!kvConfigured) {
         return res.status(200).json({
           success: true,
           configured: false,
@@ -111,12 +113,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'Invalid fleet payload' });
       }
 
-      if (!isKVConfigured() || !kv) {
+      if (!kvConfigured) {
         return res.status(200).json({
           success: false,
           configured: false,
           blobConfigured,
-          message: 'Vercel KV Storage not connected'
+          message: 'Vercel KV / Upstash Redis Storage not connected'
         });
       }
 
@@ -137,6 +139,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (error) {
     console.error('API /api/fleet error:', error);
-    return res.status(500).json({ success: false, error: error.message, blobConfigured });
+    return res.status(500).json({ success: false, error: error.message, blobConfigured, configured: kvConfigured });
   }
 }

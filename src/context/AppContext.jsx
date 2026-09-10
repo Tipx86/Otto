@@ -81,6 +81,9 @@ export function AppProvider({ children }) {
     syncing: false
   });
 
+  // Track hydration completion so initial default state never overwrites user data on page refresh
+  const isHydratedRef = useRef(false);
+
   // Hydrate from Local Storage first, then check Cloud KV for Cross-Device Synchronization
   useEffect(() => {
     let isMounted = true;
@@ -165,8 +168,11 @@ export function AppProvider({ children }) {
           }
         }
       } catch (err) {
-        // Dev server or offline
         console.info('[Cloud Sync] Running in local offline mode:', err.message);
+      } finally {
+        if (isMounted) {
+          isHydratedRef.current = true;
+        }
       }
     }
 
@@ -212,24 +218,29 @@ export function AppProvider({ children }) {
     specialRequests: ''
   });
 
-  // Safe Dual-Layer Persistent Sync (IndexedDB + localStorage)
+  // Safe Dual-Layer Persistent Sync (only after initial hydration is complete)
   useEffect(() => {
+    if (!isHydratedRef.current) return;
     savePersistent(STORAGE_KEYS.FLEET, fleet);
   }, [fleet]);
 
   useEffect(() => {
+    if (!isHydratedRef.current) return;
     savePersistent(STORAGE_KEYS.BOOKINGS, bookings);
   }, [bookings]);
 
   useEffect(() => {
+    if (!isHydratedRef.current) return;
     savePersistent(STORAGE_KEYS.SITE_CONTENT, siteContent);
   }, [siteContent]);
 
   useEffect(() => {
+    if (!isHydratedRef.current) return;
     savePersistent(STORAGE_KEYS.CURRENCY, currency);
   }, [currency]);
 
   useEffect(() => {
+    if (!isHydratedRef.current) return;
     savePersistent(STORAGE_KEYS.WISHLIST, wishlist);
   }, [wishlist]);
 

@@ -1,4 +1,4 @@
-import { kv, isKVConfigured } from './_kv.js';
+import { getKVClient, isKVConfigured } from './_kv.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -10,9 +10,12 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  const kv = getKVClient();
+  const kvConfigured = isKVConfigured() && Boolean(kv);
+
   try {
     if (req.method === 'GET') {
-      if (!isKVConfigured() || !kv) {
+      if (!kvConfigured) {
         return res.status(200).json({
           success: true,
           configured: false,
@@ -30,11 +33,11 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
       const { inquiry } = req.body || {};
-      if (!inquiry) {
-        return res.status(400).json({ success: false, error: 'Missing inquiry object' });
+      if (!inquiry || !inquiry.id) {
+        return res.status(400).json({ success: false, error: 'Invalid inquiry data' });
       }
 
-      if (!isKVConfigured() || !kv) {
+      if (!kvConfigured) {
         return res.status(200).json({
           success: false,
           configured: false,
@@ -42,18 +45,21 @@ export default async function handler(req, res) {
         });
       }
 
-      const current = (await kv.get('otto:inquiries')) || [];
-      const updated = [inquiry, ...(Array.isArray(current) ? current : [])];
+      const existing = (await kv.get('otto:inquiries')) || [];
+      const updated = [inquiry, ...(Array.isArray(existing) ? existing.filter(i => i.id !== inquiry.id) : [])];
       await kv.set('otto:inquiries', updated);
+
       return res.status(200).json({
         success: true,
         configured: true,
-        message: 'Inquiry recorded in cloud database'
+        message: 'Inquiry saved to cloud',
+        id: inquiry.id
       });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    console.error('API /api/inquiries error:', error);
+    return res.status(500).json({ success: false, error: error.message, configured: kvConfigured });
   }
 }
