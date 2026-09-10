@@ -624,7 +624,7 @@ export const CITIES_WE_SERVE = [
   {
     name: "Diani",
     subtitle: "White-sand beaches",
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"
+    image: "/diani-beach.jpg"
   },
   {
     name: "Kisumu",
@@ -634,17 +634,17 @@ export const CITIES_WE_SERVE = [
   {
     name: "Malindi",
     subtitle: "Coastal escape",
-    image: "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=600&q=80"
+    image: "/malindi-dhow.jpg"
   },
   {
     name: "Kakamega",
     subtitle: "Rainforest country",
-    image: "https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=600&q=80"
+    image: "/kakamega-rocks.jpg"
   },
   {
     name: "Kericho",
     subtitle: "Tea highlands",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80"
+    image: "/kericho-tea.jpg"
   },
   {
     name: "Kisii",
@@ -669,7 +669,7 @@ export const CITIES_WE_SERVE = [
   {
     name: "Siaya",
     subtitle: "Wetlands · lakeshore",
-    image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80"
+    image: "/siaya-fisherman.jpg"
   }
 ];
 
