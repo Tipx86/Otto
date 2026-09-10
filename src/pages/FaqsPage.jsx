@@ -107,7 +107,7 @@ export default function FaqsPage() {
           <p className="text-xs text-slate-500">Our customer team is on standby 24/7 to assist with your rental itinerary.</p>
           <div className="pt-1 flex justify-center gap-3">
             <a
-              href={`https://wa.me/${siteContent.brand.whatsapp}?text=Hello%20OTTORENTAL`}
+              href={`https://api.whatsapp.com/send?phone=${(siteContent.brand?.whatsapp || '254119317161').replace(/[^0-9]/g, '')}&text=${encodeURIComponent('Hello OttoRental, I would like to make an enquiry on vehicle rental and availability.')}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase shadow-sm"

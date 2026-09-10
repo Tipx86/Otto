@@ -215,7 +215,7 @@ export default function ContactPage() {
               {/* WhatsApp Button */}
               <div className="pt-2">
                 <a
-                  href={`https://wa.me/${siteContent.brand.whatsapp}?text=Hello%20OTTORENTAL%20Concierge`}
+                  href={`https://api.whatsapp.com/send?phone=${(siteContent.brand?.whatsapp || '254119317161').replace(/[^0-9]/g, '')}&text=${encodeURIComponent('Hello OttoRental, I would like to make an enquiry on available vehicles and car hire services.')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase transition-colors shadow-sm"

@@ -44,7 +44,7 @@ export default function Footer() {
               </p>
               <div className="pt-2 flex items-center gap-3">
                 <a
-                  href={`https://wa.me/${siteContent.brand.whatsapp}?text=Hello%20OTTORENTAL`}
+                  href={`https://api.whatsapp.com/send?phone=${(siteContent.brand?.whatsapp || '254119317161').replace(/[^0-9]/g, '')}&text=${encodeURIComponent('Hello OttoRental, I would like to make an enquiry on available vehicles.')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 font-bold"

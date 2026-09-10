@@ -172,13 +172,16 @@ export default function BookingPage() {
       ? calculation.addOns.map(a => `  • ${a.name} (${formatPrice(Math.round(a.price / 128.5), a.price * (a.days || 1))})`).join('\n')
       : '  • Standard Comprehensive Cover';
 
-    return `*NEW OTTORENTAL BOOKING REQUEST* 🚗✨
+    return `Hello OttoRental, I would like to make an enquiry on vehicle availability for this booking request:
+
+━━━━━━━━━━━━━━━━━━━━━
+🚗 *OTTORENTAL RESERVATION ENQUIRY*
 ━━━━━━━━━━━━━━━━━━━━━
 🔖 *Booking Ref:* ${bookingObj.id}
 🚘 *Vehicle:* ${selectedCar.name} (${selectedCar.category})
 ⚙️ *Rental Mode:* ${rentalMode === 'chauffeured' || chauffeur ? 'With Chauffeur' : 'Self-Drive'}
 
-📅 *Dates:* ${pickupDate} to ${returnDate} (${calculation.days} Days)
+📅 *Dates:* ${pickupDate} to ${returnDate} (${calculation.days} ${calculation.days === 1 ? 'Day' : 'Days'})
 ⏰ *Times:* ${pickupTime} - ${returnTime}
 📍 *Pickup Location:* ${pickupLocation}
 🏁 *Return Location:* ${dropoffLocation}
@@ -195,7 +198,7 @@ ${specialRequests ? `• *Special Requests:* ${specialRequests}\n` : ''}
 • *Kenya Shillings:* KSh ${calculation.grandTotalKsh.toLocaleString()}
 • *USD Equivalent:* $${calculation.grandTotalUSD}
 ━━━━━━━━━━━━━━━━━━━━━
-Hello OTTORENTAL Concierge, I have submitted this reservation and would like to confirm vehicle availability and handover.`;
+Kindly confirm vehicle availability and handover details. Thank you!`;
   };
 
   const handleSubmitBooking = (e) => {
@@ -247,7 +250,7 @@ Hello OTTORENTAL Concierge, I have submitted this reservation and would like to 
     // Open WhatsApp directly with full booking manifest prefilled
     const waNumber = (siteContent.brand?.whatsapp || '254119317161').replace(/[^0-9]/g, '');
     const waText = getFormattedWhatsAppMessage(newBooking);
-    const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
+    const waUrl = `https://api.whatsapp.com/send?phone=${waNumber}&text=${encodeURIComponent(waText)}`;
     
     // Open in a new tab/window
     window.open(waUrl, '_blank');
@@ -725,7 +728,7 @@ Hello OTTORENTAL Concierge, I have submitted this reservation and would like to 
 
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2 print:hidden">
               <a
-                href={`https://wa.me/${(siteContent.brand?.whatsapp || '254119317161').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(confirmedBooking ? getFormattedWhatsAppMessage(confirmedBooking) : 'Hello OTTORENTAL')}`}
+                href={`https://api.whatsapp.com/send?phone=${(siteContent.brand?.whatsapp || '254119317161').replace(/[^0-9]/g, '')}&text=${encodeURIComponent(confirmedBooking ? getFormattedWhatsAppMessage(confirmedBooking) : 'Hello OttoRental, I would like to make an enquiry on vehicle availability.')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="py-3 px-6 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs uppercase flex items-center gap-2 shadow-md transition-all"

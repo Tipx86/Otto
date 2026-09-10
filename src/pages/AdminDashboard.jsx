@@ -1625,7 +1625,7 @@ export default function AdminDashboard() {
 
               <div className="flex items-center justify-end gap-3 pt-2">
                 <a
-                  href={`https://wa.me/${viewingBooking.customer.phone.replace(/[^0-9]/g, '')}?text=Hello%20${viewingBooking.customer.fullName}%2C%20this%20is%20OTTORENTAL%20regarding%20booking%20${viewingBooking.id}.`}
+                  href={`https://api.whatsapp.com/send?phone=${viewingBooking.customer.phone.replace(/[^0-9]/g, '')}&text=${encodeURIComponent(`Hello ${viewingBooking.customer.fullName}, this is OttoRental regarding your vehicle reservation ${viewingBooking.id}.`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-otto-primary text-xs py-2.5 px-5 uppercase flex items-center gap-1.5"
