@@ -296,13 +296,18 @@ export function AppProvider({ children }) {
     try {
       const fleetOk = await syncFleetToCloud();
       const contentOk = await syncContentToCloud();
-      if (fleetOk || contentOk) {
-        showToast('Entire fleet inventory and website CMS synced across all devices!', 'success');
+      if (fleetOk && contentOk) {
+        showToast('✅ Fleet & content synced to Supabase — visible on all devices!', 'success');
+      } else if (fleetOk) {
+        showToast('✅ Fleet synced! Content sync had an issue.', 'gold');
+      } else {
+        showToast('⚠️ Sync failed — add storage policy in Supabase then try again.', 'error');
       }
     } finally {
       setCloudSyncStatus(prev => ({ ...prev, syncing: false }));
     }
   };
+
 
   // Price conversion helper (Supports KSh as prominent, USD, EUR, GBP, AED)
   const formatPrice = (amountUSD, customKsh = null) => {

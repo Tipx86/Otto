@@ -29,16 +29,31 @@ export async function dbSaveFleet(fleetArray) {
   try {
     // Upload any base64 images to Supabase Storage first
     const cleanFleet = await offloadFleetImages(fleetArray);
+
+    // Safety: strip any remaining base64 strings to prevent oversized DB payloads
+    // (If Storage upload failed, replace base64 with a placeholder so DB save still works)
+    const safeFleet = cleanFleet.map(car => ({
+      ...car,
+      images: Array.isArray(car.images)
+        ? car.images.map(img =>
+            typeof img === 'string' && img.startsWith('data:image/')
+              ? '/placeholder-car.jpg'  // Storage upload failed - use placeholder
+              : img
+          )
+        : car.images
+    }));
+
     const { error } = await supabase
       .from('fleet')
-      .upsert({ id: 'main', data: cleanFleet, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+      .upsert({ id: 'main', data: safeFleet, updated_at: new Date().toISOString() }, { onConflict: 'id' });
     if (error) throw error;
-    return { success: true, data: cleanFleet };
+    return { success: true, data: safeFleet };
   } catch (e) {
     console.error('[Supabase] saveFleet:', e.message);
     return { success: false };
   }
 }
+
 
 // ─── SITE CONTENT ─────────────────────────────────────────────────────────────
 
