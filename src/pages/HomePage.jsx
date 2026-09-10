@@ -24,7 +24,7 @@ const HERO_CITIES = [
   {
     name: "Diani, Kenya",
     locationValue: "Diani",
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=85",
+    image: "/diani-beach.jpg",
     description: "White-sand beaches"
   },
   {
