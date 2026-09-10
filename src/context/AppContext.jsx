@@ -110,7 +110,8 @@ export function AppProvider({ children }) {
 
       // 2. Fetch master state from Cloud KV (cross-device sync)
       try {
-        const fleetRes = await fetch('/api/fleet');
+        const timestamp = Date.now();
+        const fleetRes = await fetch(`/api/fleet?t=${timestamp}`, { cache: 'no-store' });
         if (fleetRes.ok) {
           const json = await fleetRes.json();
           if (isMounted) {
@@ -134,7 +135,7 @@ export function AppProvider({ children }) {
         }
 
         // Fetch master CMS content from cloud
-        const contentRes = await fetch('/api/content');
+        const contentRes = await fetch(`/api/content?t=${timestamp}`, { cache: 'no-store' });
         if (contentRes.ok) {
           const contentJson = await contentRes.json();
           if (isMounted && contentJson.source === 'cloud' && contentJson.data) {
@@ -145,7 +146,7 @@ export function AppProvider({ children }) {
         }
 
         // Fetch master bookings from cloud
-        const bookingsRes = await fetch('/api/bookings');
+        const bookingsRes = await fetch(`/api/bookings?t=${timestamp}`, { cache: 'no-store' });
         if (bookingsRes.ok) {
           const bookingsJson = await bookingsRes.json();
           if (isMounted && bookingsJson.configured && Array.isArray(bookingsJson.data) && bookingsJson.data.length > 0) {
@@ -155,7 +156,7 @@ export function AppProvider({ children }) {
         }
 
         // Fetch master inquiries from cloud
-        const inqRes = await fetch('/api/inquiries');
+        const inqRes = await fetch(`/api/inquiries?t=${timestamp}`, { cache: 'no-store' });
         if (inqRes.ok) {
           const inqJson = await inqRes.json();
           if (isMounted && inqJson.configured && Array.isArray(inqJson.data) && inqJson.data.length > 0) {
@@ -295,9 +296,25 @@ export function AppProvider({ children }) {
           await savePersistent(STORAGE_KEYS.SITE_CONTENT, json.data);
         }
         showToast('Website content synced to cloud database!', 'success');
+        return true;
       }
+      return false;
     } catch (err) {
       console.warn('[Content Cloud Sync] Failed:', err);
+      return false;
+    }
+  };
+
+  const syncAllToCloud = async () => {
+    setCloudSyncStatus(prev => ({ ...prev, syncing: true }));
+    try {
+      const fleetOk = await syncFleetToCloud();
+      const contentOk = await syncContentToCloud();
+      if (fleetOk || contentOk) {
+        showToast('Entire fleet inventory and website CMS synced across all devices!', 'success');
+      }
+    } finally {
+      setCloudSyncStatus(prev => ({ ...prev, syncing: false }));
     }
   };
 
@@ -617,6 +634,7 @@ export const INITIAL_BOOKINGS = ${JSON.stringify(bookings, null, 2)};
         cloudSyncStatus,
         syncFleetToCloud,
         syncContentToCloud,
+        syncAllToCloud,
         inquiries,
         addInquiry,
         deleteInquiry

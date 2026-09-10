@@ -57,6 +57,7 @@ export default function AdminDashboard() {
     cloudSyncStatus,
     syncFleetToCloud,
     syncContentToCloud,
+    syncAllToCloud,
     navigateTo, 
     showToast,
     inquiries = [],
@@ -377,13 +378,13 @@ export default function AdminDashboard() {
 
           <div className="flex flex-wrap items-center gap-2.5">
             <button
-              onClick={() => syncFleetToCloud()}
+              onClick={() => syncAllToCloud()}
               disabled={cloudSyncStatus.syncing}
               className="px-4 py-2 rounded-full bg-blue-50 hover:bg-blue-100 border border-blue-200 text-xs font-bold text-blue-700 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-              title="Push vehicle fleet updates directly to Vercel KV cloud storage"
+              title="Push entire vehicle fleet and website CMS updates to cloud storage"
             >
               <UploadCloud className={`w-3.5 h-3.5 ${cloudSyncStatus.syncing ? 'animate-spin' : ''}`} />
-              <span>{cloudSyncStatus.syncing ? 'Syncing...' : 'Sync to Cloud'}</span>
+              <span>{cloudSyncStatus.syncing ? 'Syncing...' : 'Sync All to Cloud'}</span>
             </button>
 
             <button
@@ -1299,12 +1300,12 @@ export default function AdminDashboard() {
               <div className="pt-1 flex flex-wrap items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => syncFleetToCloud()}
+                  onClick={() => syncAllToCloud()}
                   disabled={cloudSyncStatus.syncing}
                   className="btn-otto-primary text-xs py-2.5 px-5 shadow-sm inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <UploadCloud className={`w-4 h-4 ${cloudSyncStatus.syncing ? 'animate-spin' : ''}`} />
-                  <span>{cloudSyncStatus.syncing ? 'Syncing to Cloud...' : 'Sync Fleet & Photos to Cloud Now'}</span>
+                  <span>{cloudSyncStatus.syncing ? 'Syncing to Cloud...' : 'Sync Fleet, Photos & CMS to Cloud Now'}</span>
                 </button>
               </div>
             </div>
