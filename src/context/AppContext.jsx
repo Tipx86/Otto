@@ -8,6 +8,17 @@ import {
   getInitialSync, 
   loadFromIndexedDB 
 } from '../utils/storage';
+import {
+  isSupabaseConfigured,
+  dbLoadFleet,
+  dbSaveFleet,
+  dbLoadContent,
+  dbSaveContent,
+  dbLoadBookings,
+  dbSaveBooking,
+  dbLoadInquiries,
+  dbSaveInquiry
+} from '../utils/supabase';
 
 const AppContext = createContext();
 
@@ -84,13 +95,12 @@ export function AppProvider({ children }) {
   // Track hydration completion so initial default state never overwrites user data on page refresh
   const isHydratedRef = useRef(false);
 
-  // Hydrate from Local Storage first, then check Cloud KV for Cross-Device Synchronization
+  // Hydrate from Local Storage first, then Supabase for Cross-Device Sync
   useEffect(() => {
     let isMounted = true;
 
     async function hydrateStorageAndCloud() {
-      // 1. Instant local IndexedDB hydration
-      // Keep refs to local data so we can compare timestamps with cloud
+      // 1. Instant local hydration from IndexedDB
       let idbFleet = null;
       try {
         idbFleet = await loadFromIndexedDB(STORAGE_KEYS.FLEET);
@@ -98,98 +108,71 @@ export function AppProvider({ children }) {
           setFleet(idbFleet);
         }
         const idbBookings = await loadFromIndexedDB(STORAGE_KEYS.BOOKINGS);
-        if (isMounted && idbBookings && Array.isArray(idbBookings)) {
-          setBookings(idbBookings);
-        }
+        if (isMounted && idbBookings && Array.isArray(idbBookings)) setBookings(idbBookings);
+
         const idbContent = await loadFromIndexedDB(STORAGE_KEYS.SITE_CONTENT);
-        if (isMounted && idbContent && typeof idbContent === 'object') {
-          setSiteContent(sanitizeContent(idbContent));
-        }
+        if (isMounted && idbContent && typeof idbContent === 'object') setSiteContent(sanitizeContent(idbContent));
+
         const idbInquiries = await loadFromIndexedDB(STORAGE_KEYS.INQUIRIES);
-        if (isMounted && idbInquiries && Array.isArray(idbInquiries)) {
-          setInquiries(idbInquiries);
-        }
+        if (isMounted && idbInquiries && Array.isArray(idbInquiries)) setInquiries(idbInquiries);
       } catch (err) {
         console.warn('[Storage] Local hydration warning:', err);
       }
 
-      // 2. Fetch master state from Cloud KV (cross-device sync)
-      try {
-        const timestamp = Date.now();
-        const fleetRes = await fetch(`/api/fleet?t=${timestamp}`, { cache: 'no-store' });
-        if (fleetRes.ok) {
-          const json = await fleetRes.json();
-          if (isMounted) {
-            setCloudSyncStatus(prev => ({
-              ...prev,
-              configured: Boolean(json.configured),
-              blobConfigured: Boolean(json.blobConfigured),
-              source: json.source || 'local'
-            }));
+      // 2. Fetch master state from Supabase (works across all devices)
+      if (isSupabaseConfigured) {
+        try {
+          // Fleet
+          const fleetResult = await dbLoadFleet();
+          if (isMounted && fleetResult && Array.isArray(fleetResult.fleet) && fleetResult.fleet.length > 0) {
+            const cloudFleet = fleetResult.fleet;
+            const cloudUpdatedAt = new Date(fleetResult.updatedAt || 0).getTime();
+            const lastKnownCloudTs = Number(localStorage.getItem('otto_fleet_cloud_ts') || '0');
+            const localHasData = idbFleet && Array.isArray(idbFleet) && idbFleet.length > 0;
 
-            // Only use cloud data if cloud has data AND either:
-            // (a) no local data exists, OR
-            // (b) cloud timestamp is newer than the last known cloud sync timestamp
-            if (json.source === 'cloud' && Array.isArray(json.data) && json.data.length > 0) {
-              const cloudTs = json.lastUpdated || 0;
-              // Read the timestamp of the last successful cloud sync we processed
-              const lastKnownCloudTs = Number(localStorage.getItem('otto_fleet_cloud_ts') || '0');
-              const localHasData = idbFleet && Array.isArray(idbFleet) && idbFleet.length > 0;
-
-              // Apply cloud data if: no local data, OR cloud has data we haven't applied yet
-              if (!localHasData || cloudTs > lastKnownCloudTs || cloudTs === 0) {
-                setFleet(json.data);
-                await savePersistent(STORAGE_KEYS.FLEET, json.data);
-                if (cloudTs > 0) {
-                  try { localStorage.setItem('otto_fleet_cloud_ts', String(cloudTs)); } catch {}
-                }
-                setCloudSyncStatus(prev => ({
-                  ...prev,
-                  lastSync: new Date().toLocaleTimeString()
-                }));
-              }
+            if (!localHasData || cloudUpdatedAt > lastKnownCloudTs) {
+              setFleet(cloudFleet);
+              await savePersistent(STORAGE_KEYS.FLEET, cloudFleet);
+              localStorage.setItem('otto_fleet_cloud_ts', String(cloudUpdatedAt));
             }
 
+            setCloudSyncStatus(prev => ({
+              ...prev,
+              configured: true,
+              source: 'supabase',
+              lastSync: new Date().toLocaleTimeString()
+            }));
+          } else if (isMounted) {
+            setCloudSyncStatus(prev => ({ ...prev, configured: isSupabaseConfigured, source: 'empty' }));
           }
-        }
 
-        // Fetch master CMS content from cloud
-        const contentRes = await fetch(`/api/content?t=${timestamp}`, { cache: 'no-store' });
-        if (contentRes.ok) {
-          const contentJson = await contentRes.json();
-          if (isMounted && contentJson.source === 'cloud' && contentJson.data) {
-            const clean = sanitizeContent(contentJson.data);
+          // Site Content
+          const cloudContent = await dbLoadContent();
+          if (isMounted && cloudContent && typeof cloudContent === 'object') {
+            const clean = sanitizeContent(cloudContent);
             setSiteContent(clean);
             await savePersistent(STORAGE_KEYS.SITE_CONTENT, clean);
           }
-        }
 
-        // Fetch master bookings from cloud
-        const bookingsRes = await fetch(`/api/bookings?t=${timestamp}`, { cache: 'no-store' });
-        if (bookingsRes.ok) {
-          const bookingsJson = await bookingsRes.json();
-          if (isMounted && bookingsJson.configured && Array.isArray(bookingsJson.data) && bookingsJson.data.length > 0) {
-            setBookings(bookingsJson.data);
-            await savePersistent(STORAGE_KEYS.BOOKINGS, bookingsJson.data);
+          // Bookings
+          const cloudBookings = await dbLoadBookings();
+          if (isMounted && Array.isArray(cloudBookings) && cloudBookings.length > 0) {
+            setBookings(cloudBookings);
+            await savePersistent(STORAGE_KEYS.BOOKINGS, cloudBookings);
           }
-        }
 
-        // Fetch master inquiries from cloud
-        const inqRes = await fetch(`/api/inquiries?t=${timestamp}`, { cache: 'no-store' });
-        if (inqRes.ok) {
-          const inqJson = await inqRes.json();
-          if (isMounted && inqJson.configured && Array.isArray(inqJson.data) && inqJson.data.length > 0) {
-            setInquiries(inqJson.data);
-            await savePersistent(STORAGE_KEYS.INQUIRIES, inqJson.data);
+          // Inquiries
+          const cloudInquiries = await dbLoadInquiries();
+          if (isMounted && Array.isArray(cloudInquiries) && cloudInquiries.length > 0) {
+            setInquiries(cloudInquiries);
+            await savePersistent(STORAGE_KEYS.INQUIRIES, cloudInquiries);
           }
-        }
-      } catch (err) {
-        console.info('[Cloud Sync] Running in local offline mode:', err.message);
-      } finally {
-        if (isMounted) {
-          isHydratedRef.current = true;
+        } catch (err) {
+          console.info('[Supabase] Running in local mode:', err.message);
         }
       }
+
+      if (isMounted) isHydratedRef.current = true;
     }
 
     hydrateStorageAndCloud();
@@ -260,53 +243,35 @@ export function AppProvider({ children }) {
     savePersistent(STORAGE_KEYS.WISHLIST, wishlist);
   }, [wishlist]);
 
-  // Cloud Synchronization Handlers
+  // Cloud Synchronization Handlers (now using Supabase directly)
   const syncFleetToCloud = async (overrideFleet = null) => {
     const dataToSend = overrideFleet || fleet;
     setCloudSyncStatus(prev => ({ ...prev, syncing: true }));
     try {
-      const res = await fetch('/api/fleet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fleet: dataToSend })
-      });
-      const json = await res.json();
-      if (json.configured) {
-        const returnedFleet = json.data && Array.isArray(json.data) ? json.data : dataToSend;
-        setFleet(returnedFleet);
-        await savePersistent(STORAGE_KEYS.FLEET, returnedFleet);
-        // Store the cloud's lastUpdated so we know next refresh that cloud is authoritative
-        if (json.lastUpdated) {
-          try { localStorage.setItem('otto_fleet_cloud_ts', String(json.lastUpdated)); } catch {}
-        }
+      const result = await dbSaveFleet(dataToSend);
+      if (result.success) {
+        // Use the cleaned fleet (with Storage URLs replacing base64)
+        const savedFleet = result.data || dataToSend;
+        setFleet(savedFleet);
+        await savePersistent(STORAGE_KEYS.FLEET, savedFleet);
+        localStorage.setItem('otto_fleet_cloud_ts', String(Date.now()));
         setCloudSyncStatus({
           configured: true,
-          blobConfigured: Boolean(json.blobConfigured),
-          source: 'cloud',
+          blobConfigured: true,
+          source: 'supabase',
           lastSync: new Date().toLocaleTimeString(),
           syncing: false
         });
-        showToast(
-          json.blobConfigured 
-            ? 'Fleet & HD photos successfully synced to Cloud & Blob CDN!' 
-            : 'Fleet synced to Vercel KV database!', 
-          'success'
-        );
+        showToast('Fleet & photos synced to Supabase cloud database! ✅', 'success');
         return true;
       } else {
-        setCloudSyncStatus({
-          configured: false,
-          blobConfigured: Boolean(json.blobConfigured),
-          source: 'local',
-          lastSync: null,
-          syncing: false
-        });
-        showToast('Saved locally. Connect Vercel KV in your Vercel Dashboard to sync to all devices.', 'info');
+        setCloudSyncStatus(prev => ({ ...prev, syncing: false, source: 'local' }));
+        showToast('Saved locally. Check Supabase connection.', 'info');
         return false;
       }
     } catch (err) {
       setCloudSyncStatus(prev => ({ ...prev, syncing: false }));
-      console.warn('[Cloud Sync] Failed:', err);
+      console.warn('[Supabase Sync] Failed:', err);
       return false;
     }
   };
@@ -314,23 +279,14 @@ export function AppProvider({ children }) {
   const syncContentToCloud = async (overrideContent = null) => {
     const dataToSend = overrideContent || siteContent;
     try {
-      const res = await fetch('/api/content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ siteContent: dataToSend })
-      });
-      const json = await res.json();
-      if (json.configured) {
-        if (json.data && typeof json.data === 'object') {
-          setSiteContent(json.data);
-          await savePersistent(STORAGE_KEYS.SITE_CONTENT, json.data);
-        }
-        showToast('Website content synced to cloud database!', 'success');
+      const ok = await dbSaveContent(dataToSend);
+      if (ok) {
+        showToast('Website content saved to Supabase!', 'success');
         return true;
       }
       return false;
     } catch (err) {
-      console.warn('[Content Cloud Sync] Failed:', err);
+      console.warn('[Supabase Content Sync] Failed:', err);
       return false;
     }
   };
@@ -464,16 +420,8 @@ export function AppProvider({ children }) {
       ...newBookingData
     };
     setBookings(prev => [fullBooking, ...prev]);
-
-    // Push reservation to cloud
-    try {
-      fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ booking: fullBooking })
-      }).catch(() => {});
-    } catch {}
-
+    // Push to Supabase
+    dbSaveBooking(fullBooking).catch(() => {});
     return fullBooking;
   };
 
@@ -498,16 +446,8 @@ export function AppProvider({ children }) {
     const updated = [newInquiry, ...inquiries];
     setInquiries(updated);
     await savePersistent(STORAGE_KEYS.INQUIRIES, updated);
-
-    // Sync to Cloud KV
-    try {
-      fetch('/api/inquiries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inquiry: newInquiry })
-      }).catch(() => {});
-    } catch {}
-
+    // Save to Supabase
+    dbSaveInquiry(newInquiry).catch(() => {});
     return newInquiry;
   };
 
