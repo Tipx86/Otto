@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { 
-  KeyRound, 
   Phone, 
   Mail, 
   MapPin, 
@@ -102,11 +101,8 @@ export default function Footer() {
           {/* Bottom Bar */}
           <div className="pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-400 text-xs">
             <p>
-              © {new Date().getFullYear()} {siteContent.brand.name || 'OTTORENTAL'}. All rights reserved. Registered rental marketplace & operator logistics.
-            </p>
-
-            <div className="flex items-center gap-4">
-              <button
+              © {new Date().getFullYear()}{' '}
+              <span
                 onClick={() => {
                   if (isAdminAuthenticated) {
                     navigateTo('admin');
@@ -114,12 +110,26 @@ export default function Footer() {
                     setAdminModalOpen(true);
                   }
                 }}
-                className="flex items-center gap-1.5 text-slate-500 hover:text-blue-600 transition-colors cursor-pointer"
+                className="cursor-default select-none"
+                title=""
               >
-                <KeyRound className="w-3.5 h-3.5 text-blue-600" />
-                <span>Admin CMS</span>
-                {isAdminAuthenticated && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>}
-              </button>
+                {siteContent.brand.name || 'OttoRental'}
+              </span>
+              . All rights reserved. Registered rental marketplace & operator logistics.
+            </p>
+
+            <div className="flex items-center gap-3 text-slate-400 text-[11px]">
+              <span>Nairobi · Mombasa · Kisumu</span>
+              {isAdminAuthenticated && (
+                <button
+                  onClick={() => navigateTo('admin')}
+                  className="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-bold transition-all hover:bg-emerald-100 cursor-pointer"
+                  title="Admin session active — click to open Control Center"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>Admin Session</span>
+                </button>
+              )}
             </div>
           </div>
 

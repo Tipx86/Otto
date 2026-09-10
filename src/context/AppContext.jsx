@@ -11,9 +11,21 @@ import {
 
 const AppContext = createContext();
 
+const getInitialPage = () => {
+  if (typeof window === 'undefined') return 'home';
+  const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+  if (path === 'admin') return 'admin';
+  if (path === 'fleet' || path === 'cars') return 'fleet';
+  if (path === 'booking') return 'booking';
+  if (path === 'contact') return 'contact';
+  if (path === 'about') return 'about';
+  if (path === 'faqs') return 'faqs';
+  return 'home';
+};
+
 export function AppProvider({ children }) {
   // Navigation State
-  const [currentPage, setCurrentPage] = useState('home');
+  const [currentPage, setCurrentPage] = useState(getInitialPage);
   const [selectedCarId, setSelectedCarId] = useState('premium-suv-prado');
   const [quickViewCar, setQuickViewCar] = useState(null);
 
@@ -291,10 +303,25 @@ export function AppProvider({ children }) {
     return Math.round(amountUSD * info.rate);
   };
 
+  // Popstate listener for back/forward browser navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPage(getInitialPage());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   // Navigation Helper
   const navigateTo = (page, carId = null) => {
     if (carId) setSelectedCarId(carId);
     setCurrentPage(page);
+    try {
+      const url = page === 'home' ? '/' : `/${page}`;
+      if (window.location.pathname !== url) {
+        window.history.pushState(null, '', url);
+      }
+    } catch {}
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

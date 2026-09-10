@@ -4,7 +4,6 @@ import { CURRENCY_RATES } from '../data/initialData';
 import { 
   Menu, 
   X, 
-  KeyRound, 
   ChevronDown, 
   Globe, 
   Car, 
@@ -35,6 +34,22 @@ export default function Navbar() {
     navigateTo(pageId);
     setMenuOpen(false);
   };
+
+  // Secret Keyboard Shortcut for Owner: Ctrl + Shift + A (or Cmd + Shift + A)
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        if (isAdminAuthenticated) {
+          navigateTo('admin');
+        } else {
+          setAdminModalOpen(true);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAdminAuthenticated, navigateTo]);
 
   // Determine if header is over light page or hero
   const isHomePage = currentPage === 'home';
@@ -144,7 +159,7 @@ export default function Navbar() {
                     </svg>
                   </div>
                   <span className="font-extrabold text-2xl tracking-tight text-slate-900">
-                    Elite<span className="text-blue-600">Ride</span>
+                    Otto<span className="text-blue-600">Rental</span>
                   </span>
                   <span className="w-2 h-2 rounded-full bg-emerald-500 mt-1"></span>
                 </div>
@@ -183,27 +198,21 @@ export default function Navbar() {
               </nav>
             </div>
 
-            {/* Bottom Admin & Contact inside Drawer */}
+            {/* Bottom Contact inside Drawer */}
             <div className="pt-6 border-t border-slate-100 space-y-3 text-xs text-slate-500">
               <div className="flex items-center justify-between">
                 <span>Direct Hotline:</span>
-                <span className="text-slate-900 font-bold">{siteContent.brand.phone}</span>
+                <a href={`tel:${siteContent.brand.phone}`} className="text-slate-900 font-bold hover:text-blue-600">
+                  {siteContent.brand.phone}
+                </a>
               </div>
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  if (isAdminAuthenticated) {
-                    navigateTo('admin');
-                  } else {
-                    setAdminModalOpen(true);
-                  }
-                }}
-                className="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center gap-2 border border-slate-200 font-semibold"
-              >
-                <KeyRound className="w-3.5 h-3.5 text-blue-600" />
-                <span>Admin CMS Dashboard</span>
-                {isAdminAuthenticated && <span className="w-2 h-2 rounded-full bg-emerald-500"></span>}
-              </button>
+              <div className="flex items-center justify-between">
+                <span>VIP Concierge:</span>
+                <span className="inline-flex items-center gap-1.5 text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1 rounded-full text-[11px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  24/7 Active
+                </span>
+              </div>
             </div>
 
           </div>
