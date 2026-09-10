@@ -5,7 +5,7 @@ export const INITIAL_SITE_CONTENT = {
     phone: "+254 119 317161",
     internationalPhone: "+254 119 317161",
     whatsapp: "254119317161",
-    email: "hello@OttoRental.co.ke",
+    email: "hello@ottorental.com",
     address: "Westlands Commercial Center, Ring Road Parklands, Nairobi, Kenya",
     operatingHours: "24/7 Handover, Airport Pickup & Roadside Support",
     securityPin: "8888"

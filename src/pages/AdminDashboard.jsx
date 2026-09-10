@@ -58,10 +58,12 @@ export default function AdminDashboard() {
     syncFleetToCloud,
     syncContentToCloud,
     navigateTo, 
-    showToast 
+    showToast,
+    inquiries = [],
+    deleteInquiry
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'fleet' | 'calendar' | 'bookings' | 'cms' | 'backup'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'fleet' | 'calendar' | 'bookings' | 'inquiries' | 'cms' | 'backup'
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState(false);
 
@@ -404,6 +406,7 @@ export default function AdminDashboard() {
             { id: 'fleet', label: `Fleet Manager (${fleet.length})`, icon: Car },
             { id: 'calendar', label: 'Availability Calendar', icon: Calendar },
             { id: 'bookings', label: `Bookings (${bookings.length})`, icon: FileText },
+            { id: 'inquiries', label: `Inquiries (${inquiries.length})`, icon: MessageCircle },
             { id: 'cms', label: 'Website Content CMS', icon: Settings },
             { id: 'backup', label: 'Backup & Restore', icon: Download }
           ].map((tab) => {
@@ -894,7 +897,106 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* TAB 5: WEBSITE CONTENT CMS */}
+        {/* TAB 5: BESPOKE INQUIRIES */}
+        {activeTab === 'inquiries' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="font-extrabold text-xl text-slate-900">
+                  Customer Bespoke Inquiries
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Review direct concierge inquiries submitted via website forms, with one-click WhatsApp reply.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              {inquiries.length === 0 ? (
+                <div className="text-center py-16 space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                    <MessageCircle className="w-6 h-6" />
+                  </div>
+                  <h4 className="font-bold text-slate-800 text-sm">No Inquiries Logged Yet</h4>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                    When visitors submit bespoke inquiries via the Contact page or site forms, they will appear here automatically.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
+                        <th className="py-3 px-4">Ref / Date</th>
+                        <th className="py-3 px-4">Customer</th>
+                        <th className="py-3 px-4">Contact</th>
+                        <th className="py-3 px-4">Nature of Inquiry</th>
+                        <th className="py-3 px-4">Message / Details</th>
+                        <th className="py-3 px-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {inquiries.map((inq) => (
+                        <tr key={inq.id} className="hover:bg-slate-50/60 transition-colors">
+                          <td className="py-3 px-4 font-mono font-bold text-slate-800">
+                            <div>{inq.id}</div>
+                            <div className="text-[10px] text-slate-400 font-normal">
+                              {new Date(inq.createdAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 font-bold text-slate-900">
+                            {inq.name}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="font-mono text-slate-700">{inq.phone}</div>
+                            <div className="text-slate-400 text-[10px]">{inq.email}</div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="inline-block px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold text-[10px] uppercase">
+                              {inq.serviceInterest || 'General Inquiry'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 max-w-xs truncate text-slate-600">
+                            {inq.message || '—'}
+                          </td>
+                          <td className="py-3 px-4 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <a
+                                href={`https://api.whatsapp.com/send?phone=${(inq.phone || '').replace(/[^0-9]/g, '')}&text=${encodeURIComponent(`Hello ${inq.name}, this is OttoRental following up on your bespoke enquiry regarding ${inq.serviceInterest || 'vehicle rental'}.`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] inline-flex items-center gap-1 shadow-sm"
+                                title="Reply on WhatsApp"
+                              >
+                                <MessageCircle className="w-3 h-3" />
+                                <span>WhatsApp</span>
+                              </a>
+                              {deleteInquiry && (
+                                <button
+                                  onClick={() => {
+                                    if (confirm(`Archive inquiry ${inq.id}?`)) {
+                                      deleteInquiry(inq.id);
+                                    }
+                                  }}
+                                  className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
+                                  title="Archive Inquiry"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 6: WEBSITE CONTENT CMS */}
         {activeTab === 'cms' && (
           <form onSubmit={handleSaveCms} className="space-y-8 animate-fade-in">
             <div className="flex items-center justify-between">

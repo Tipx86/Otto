@@ -13,7 +13,8 @@ export const STORAGE_KEYS = {
   BOOKINGS: 'otto_bookings_v4',
   SITE_CONTENT: 'otto_site_content_v4',
   CURRENCY: 'otto_currency_v4',
-  WISHLIST: 'otto_wishlist_v4'
+  WISHLIST: 'otto_wishlist_v4',
+  INQUIRIES: 'otto_inquiries_v4'
 };
 
 const isBrowser = typeof window !== 'undefined';

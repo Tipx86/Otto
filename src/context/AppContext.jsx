@@ -27,9 +27,27 @@ export function AppProvider({ children }) {
     getInitialSync(STORAGE_KEYS.BOOKINGS, INITIAL_BOOKINGS)
   );
 
+  // Helper to purge legacy brand strings
+  const sanitizeContent = (c) => {
+    if (!c || typeof c !== 'object') return c;
+    const brand = { ...c.brand };
+    if (brand.email && (brand.email.toLowerCase().includes('eliteride') || brand.email.toLowerCase().includes('ottorental.co.ke'))) {
+      brand.email = 'hello@ottorental.com';
+    }
+    if (brand.name && brand.name.toLowerCase().includes('eliteride')) {
+      brand.name = 'OttoRental';
+    }
+    return { ...c, brand };
+  };
+
   // Persistence: Site Content (CMS)
   const [siteContent, setSiteContent] = useState(() => 
-    getInitialSync(STORAGE_KEYS.SITE_CONTENT, INITIAL_SITE_CONTENT)
+    sanitizeContent(getInitialSync(STORAGE_KEYS.SITE_CONTENT, INITIAL_SITE_CONTENT))
+  );
+
+  // Persistence: Inquiries
+  const [inquiries, setInquiries] = useState(() => 
+    getInitialSync(STORAGE_KEYS.INQUIRIES, [])
   );
 
   // Persistence: Currency
@@ -67,7 +85,11 @@ export function AppProvider({ children }) {
         }
         const idbContent = await loadFromIndexedDB(STORAGE_KEYS.SITE_CONTENT);
         if (isMounted && idbContent && typeof idbContent === 'object') {
-          setSiteContent(idbContent);
+          setSiteContent(sanitizeContent(idbContent));
+        }
+        const idbInquiries = await loadFromIndexedDB(STORAGE_KEYS.INQUIRIES);
+        if (isMounted && idbInquiries && Array.isArray(idbInquiries)) {
+          setInquiries(idbInquiries);
         }
       } catch (err) {
         console.warn('[Storage] Local hydration warning:', err);
@@ -102,8 +124,9 @@ export function AppProvider({ children }) {
         if (contentRes.ok) {
           const contentJson = await contentRes.json();
           if (isMounted && contentJson.source === 'cloud' && contentJson.data) {
-            setSiteContent(contentJson.data);
-            await savePersistent(STORAGE_KEYS.SITE_CONTENT, contentJson.data);
+            const clean = sanitizeContent(contentJson.data);
+            setSiteContent(clean);
+            await savePersistent(STORAGE_KEYS.SITE_CONTENT, clean);
           }
         }
 
@@ -114,6 +137,16 @@ export function AppProvider({ children }) {
           if (isMounted && bookingsJson.configured && Array.isArray(bookingsJson.data) && bookingsJson.data.length > 0) {
             setBookings(bookingsJson.data);
             await savePersistent(STORAGE_KEYS.BOOKINGS, bookingsJson.data);
+          }
+        }
+
+        // Fetch master inquiries from cloud
+        const inqRes = await fetch('/api/inquiries');
+        if (inqRes.ok) {
+          const inqJson = await inqRes.json();
+          if (isMounted && inqJson.configured && Array.isArray(inqJson.data) && inqJson.data.length > 0) {
+            setInquiries(inqJson.data);
+            await savePersistent(STORAGE_KEYS.INQUIRIES, inqJson.data);
           }
         }
       } catch (err) {
@@ -363,6 +396,37 @@ export function AppProvider({ children }) {
     showToast(`Reservation ${bookingId} has been archived.`, 'info');
   };
 
+  // Inquiries Handling
+  const addInquiry = async (inquiryData) => {
+    const newInquiry = {
+      id: `INQ-${Math.floor(10000 + Math.random() * 90000)}`,
+      createdAt: new Date().toISOString(),
+      status: 'pending',
+      ...inquiryData
+    };
+    const updated = [newInquiry, ...inquiries];
+    setInquiries(updated);
+    await savePersistent(STORAGE_KEYS.INQUIRIES, updated);
+
+    // Sync to Cloud KV
+    try {
+      fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inquiry: newInquiry })
+      }).catch(() => {});
+    } catch {}
+
+    return newInquiry;
+  };
+
+  const deleteInquiry = async (inquiryId) => {
+    const updated = inquiries.filter(i => i.id !== inquiryId);
+    setInquiries(updated);
+    await savePersistent(STORAGE_KEYS.INQUIRIES, updated);
+    showToast(`Inquiry ${inquiryId} archived.`, 'info');
+  };
+
   // Admin Auth
   const adminLogin = (enteredPin) => {
     const validPin = siteContent.brand.securityPin || '8888';
@@ -508,7 +572,10 @@ export const INITIAL_BOOKINGS = ${JSON.stringify(bookings, null, 2)};
         downloadInitialDataJS,
         cloudSyncStatus,
         syncFleetToCloud,
-        syncContentToCloud
+        syncContentToCloud,
+        inquiries,
+        addInquiry,
+        deleteInquiry
       }}
     >
       {children}

@@ -17,23 +17,59 @@ import {
 } from 'lucide-react';
 
 export default function ContactPage() {
-  const { siteContent, showToast } = useApp();
+  const { siteContent, showToast, addInquiry } = useApp();
 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    serviceInterest: 'Car Rental Inquiry',
+    serviceInterest: 'Vehicle Rental Inquiry',
     message: ''
   });
 
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e) => {
+  const formatBespokeInquiryMessage = (data) => {
+    return `Hello OttoRental, I would like to make an enquiry:
+
+━━━━━━━━━━━━━━━━━━━━━
+📋 *NEW BESPOKE INQUIRY*
+━━━━━━━━━━━━━━━━━━━━━
+👤 *Full Name:* ${data.name}
+📱 *Phone / WhatsApp:* ${data.phone}
+📧 *Email:* ${data.email}
+🏷️ *Nature of Inquiry:* ${data.serviceInterest}
+
+📝 *Itinerary Details & Preferences:*
+${data.message && data.message.trim() ? data.message.trim() : 'No specific details provided.'}
+━━━━━━━━━━━━━━━━━━━━━
+Kindly review and get back to me. Thank you!`;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     trackGenerateLead(formData.serviceInterest || 'General Inquiry', 'Contact Page Form');
+
+    // 1. Channel through WhatsApp directly to OttoRental
+    const waNumber = (siteContent.brand?.whatsapp || '254119317161').replace(/[^0-9]/g, '');
+    const waText = formatBespokeInquiryMessage(formData);
+    const waUrl = `https://api.whatsapp.com/send?phone=${waNumber}&text=${encodeURIComponent(waText)}`;
+    
+    // Automatically open WhatsApp
+    window.open(waUrl, '_blank');
+
+    // 2. Persist to Cloud Database so inquiry is saved
+    try {
+      if (addInquiry) {
+        await addInquiry(formData);
+      }
+    } catch (err) {
+      console.warn('Could not record inquiry:', err);
+    }
+
+    // 3. Display success confirmation to client
     setSubmitted(true);
-    showToast('Inquiry submitted. An OTTORENTAL concierge will contact you shortly.', 'success');
+    showToast('Inquiry transmitted to OttoRental Concierge.', 'success');
   };
 
   return (
@@ -248,8 +284,11 @@ export default function ContactPage() {
                 <Mail className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div className="space-y-0.5">
                   <span className="font-bold text-slate-900 uppercase block">Direct Inquiries</span>
-                  <a href={`mailto:${siteContent.brand.email}`} className="text-blue-600 font-semibold hover:underline">
-                    {siteContent.brand.email}
+                  <a 
+                    href={`mailto:${siteContent.brand?.email && !siteContent.brand.email.includes('eliteride') ? siteContent.brand.email : 'hello@ottorental.com'}`} 
+                    className="text-blue-600 font-semibold hover:underline"
+                  >
+                    {siteContent.brand?.email && !siteContent.brand.email.includes('eliteride') ? siteContent.brand.email : 'hello@ottorental.com'}
                   </a>
                 </div>
               </div>
