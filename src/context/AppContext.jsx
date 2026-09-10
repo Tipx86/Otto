@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { INITIAL_CARS, INITIAL_BOOKINGS, CURRENCY_RATES } from '../data/initialData';
 import { INITIAL_SITE_CONTENT } from '../data/siteContent';
 import { trackAddToWishlist, trackLogin } from '../utils/analytics';
