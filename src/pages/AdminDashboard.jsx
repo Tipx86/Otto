@@ -117,6 +117,9 @@ export default function AdminDashboard() {
   // Booking Detail Modal
   const [viewingBooking, setViewingBooking] = useState(null);
 
+  // Inquiry Detail Modal
+  const [viewingInquiry, setViewingInquiry] = useState(null);
+
   // CMS Form State
   const [cmsData, setCmsData] = useState(siteContent);
   const [newFaq, setNewFaq] = useState({ category: 'Payments & M-Pesa', question: '', answer: '' });
@@ -962,11 +965,26 @@ export default function AdminDashboard() {
                               {inq.serviceInterest || 'General Inquiry'}
                             </span>
                           </td>
-                          <td className="py-3 px-4 max-w-xs truncate text-slate-600">
-                            {inq.message || '—'}
+                          <td className="py-3 px-4 max-w-[200px] text-slate-600">
+                            <span className="line-clamp-2 leading-relaxed">{inq.message || '—'}</span>
+                            {inq.message && inq.message.length > 80 && (
+                              <button
+                                onClick={() => setViewingInquiry(inq)}
+                                className="mt-1 text-blue-600 hover:text-blue-800 text-[10px] font-bold underline underline-offset-2"
+                              >
+                                View full message
+                              </button>
+                            )}
                           </td>
                           <td className="py-3 px-4 text-right">
                             <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                onClick={() => setViewingInquiry(inq)}
+                                className="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition-colors"
+                                title="View Full Message"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                              </button>
                               <a
                                 href={`https://api.whatsapp.com/send?phone=${(inq.phone || '').replace(/[^0-9]/g, '')}&text=${encodeURIComponent(`Hello ${inq.name}, this is OttoRental following up on your bespoke enquiry regarding ${inq.serviceInterest || 'vehicle rental'}.`)}`}
                                 target="_blank"
@@ -996,6 +1014,86 @@ export default function AdminDashboard() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+
+              {/* Inquiry Full Message Modal */}
+              {viewingInquiry && (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+                  onClick={() => setViewingInquiry(null)}
+                >
+                  <div
+                    className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-7 space-y-5 relative"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Header */}
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Enquiry Ref</span>
+                        <h3 className="font-extrabold text-lg text-slate-900 font-mono">{viewingInquiry.id}</h3>
+                        <p className="text-xs text-slate-400">
+                          {new Date(viewingInquiry.createdAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setViewingInquiry(null)}
+                        className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Customer Info */}
+                    <div className="grid grid-cols-2 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-0.5">Name</p>
+                        <p className="font-bold text-slate-900">{viewingInquiry.name}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-0.5">Nature</p>
+                        <span className="inline-block px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold text-[10px] uppercase">
+                          {viewingInquiry.serviceInterest || 'General Inquiry'}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-0.5">Phone</p>
+                        <a href={`tel:${viewingInquiry.phone}`} className="font-semibold text-slate-800 hover:text-blue-600">{viewingInquiry.phone || '—'}</a>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-0.5">Email</p>
+                        <a href={`mailto:${viewingInquiry.email}`} className="font-semibold text-slate-800 hover:text-blue-600 break-all">{viewingInquiry.email || '—'}</a>
+                      </div>
+                    </div>
+
+                    {/* Full Message */}
+                    <div>
+                      <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-2">Full Message</p>
+                      <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-800 leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto">
+                        {viewingInquiry.message || 'No message provided.'}
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-3 pt-1">
+                      <a
+                        href={`https://api.whatsapp.com/send?phone=${(viewingInquiry.phone || '').replace(/[^0-9]/g, '')}&text=${encodeURIComponent(`Hello ${viewingInquiry.name}, this is OttoRental following up on your enquiry regarding ${viewingInquiry.serviceInterest || 'vehicle rental'}. ${viewingInquiry.message ? 'You mentioned: "' + viewingInquiry.message.slice(0, 200) + '"' : ''}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        Reply on WhatsApp
+                      </a>
+                      <a
+                        href={`mailto:${viewingInquiry.email}?subject=Re: Your Enquiry - OttoRental&body=Hello ${viewingInquiry.name},%0D%0A%0D%0AThank you for reaching out to OttoRental.%0D%0A%0D%0ARegarding your enquiry: ${viewingInquiry.message || ''}%0D%0A%0D%0AWe will get back to you shortly.%0D%0A%0D%0ABest regards,%0D%0AOttoRental Team`}
+                        className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 transition-all"
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                        Reply by Email
+                      </a>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
