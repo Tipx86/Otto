@@ -223,6 +223,66 @@ export default function Footer() {
 
           </div>
 
+          {/* Contact Details Bar */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 py-8 border-t border-slate-200">
+
+            {/* Phone */}
+            <a
+              href={`tel:${siteContent.brand?.phone || '+254119317161'}`}
+              className="flex items-center gap-3 group hover:text-blue-600 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 group-hover:bg-blue-100 transition-colors">
+                <Phone className="w-4 h-4 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Call Us</p>
+                <p className="text-xs font-bold text-slate-800 group-hover:text-blue-600">{siteContent.brand?.phone || '+254 119 317161'}</p>
+              </div>
+            </a>
+
+            {/* WhatsApp */}
+            <a
+              href={`https://api.whatsapp.com/send?phone=${(siteContent.brand?.whatsapp || '254119317161').replace(/[^0-9]/g, '')}&text=${encodeURIComponent('Hello OttoRental, I would like to make an enquiry.')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 group hover:text-emerald-600 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">
+                <MessageCircle className="w-4 h-4 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">WhatsApp</p>
+                <p className="text-xs font-bold text-slate-800 group-hover:text-emerald-600">+{siteContent.brand?.whatsapp || '254 119 317161'}</p>
+              </div>
+            </a>
+
+            {/* Email */}
+            <a
+              href={`mailto:${siteContent.brand?.email || 'hello@ottorental.com'}`}
+              className="flex items-center gap-3 group hover:text-blue-600 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 group-hover:bg-blue-100 transition-colors">
+                <Mail className="w-4 h-4 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Email Us</p>
+                <p className="text-xs font-bold text-slate-800 group-hover:text-blue-600">{siteContent.brand?.email || 'hello@ottorental.com'}</p>
+              </div>
+            </a>
+
+            {/* Address */}
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
+                <MapPin className="w-4 h-4 text-slate-500" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Location</p>
+                <p className="text-xs font-semibold text-slate-700 leading-relaxed">{siteContent.brand?.address || 'Westlands, Nairobi, Kenya'}</p>
+              </div>
+            </div>
+
+          </div>
+
           {/* Bottom Bar */}
           <div className="pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-400 text-xs">
             <p>
