@@ -22,22 +22,41 @@ import {
 
 const AppContext = createContext();
 
-const getInitialPage = () => {
-  if (typeof window === 'undefined') return 'home';
-  const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-  if (path === 'admin') return 'admin';
-  if (path === 'fleet' || path === 'cars') return 'fleet';
-  if (path === 'booking') return 'booking';
-  if (path === 'contact') return 'contact';
-  if (path === 'about') return 'about';
-  if (path === 'faqs') return 'faqs';
-  return 'home';
+const parseRouteFromLocation = () => {
+  if (typeof window === 'undefined') return { page: 'home', carId: 'premium-suv-prado' };
+  const pathname = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+  const searchParams = new URLSearchParams(window.location.search);
+  const queryPage = (searchParams.get('page') || '').toLowerCase();
+  const queryCarId = searchParams.get('id') || searchParams.get('car') || '';
+
+  // 1. Clean car detail path: /cars/:id or /car/:id
+  if (pathname.startsWith('cars/') || pathname.startsWith('car/')) {
+    const parts = pathname.split('/');
+    const carId = parts[1] || 'premium-suv-prado';
+    return { page: 'car-details', carId };
+  }
+
+  // 2. Legacy query string: ?page=car&id=...
+  if (queryPage === 'car' || queryPage === 'car-details') {
+    return { page: 'car-details', carId: queryCarId || 'premium-suv-prado' };
+  }
+
+  // 3. Clean REST routes and legacy query param support
+  if (pathname === 'admin' || queryPage === 'admin') return { page: 'admin', carId: null };
+  if (pathname === 'fleet' || pathname === 'cars' || queryPage === 'fleet') return { page: 'fleet', carId: null };
+  if (pathname === 'booking' || queryPage === 'booking') return { page: 'booking', carId: queryCarId || null };
+  if (pathname === 'contact' || queryPage === 'contact') return { page: 'contact', carId: null };
+  if (pathname === 'about' || queryPage === 'about') return { page: 'about', carId: null };
+  if (pathname === 'faqs' || pathname === 'faq' || queryPage === 'faqs' || queryPage === 'faq') return { page: 'faqs', carId: null };
+
+  return { page: 'home', carId: 'premium-suv-prado' };
 };
 
 export function AppProvider({ children }) {
-  // Navigation State
-  const [currentPage, setCurrentPage] = useState(getInitialPage);
-  const [selectedCarId, setSelectedCarId] = useState('premium-suv-prado');
+  // Navigation State parsed directly from URL on load/refresh
+  const initialRoute = parseRouteFromLocation();
+  const [currentPage, setCurrentPage] = useState(initialRoute.page);
+  const [selectedCarId, setSelectedCarId] = useState(initialRoute.carId || 'premium-suv-prado');
   const [quickViewCar, setQuickViewCar] = useState(null);
 
   // Persistence: Fleet (Immediate sync read + async IndexedDB hydration)
@@ -333,22 +352,46 @@ export function AppProvider({ children }) {
   // Popstate listener for back/forward browser navigation
   useEffect(() => {
     const handlePopState = () => {
-      setCurrentPage(getInitialPage());
+      const { page, carId } = parseRouteFromLocation();
+      setCurrentPage(page);
+      if (carId) setSelectedCarId(carId);
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Navigation Helper
+  // Navigation Helper with clean SEO RESTful URLs
   const navigateTo = (page, carId = null) => {
-    if (carId) setSelectedCarId(carId);
+    let resolvedCarId = carId || selectedCarId;
+    if (page === 'car-details' && carId) {
+      setSelectedCarId(carId);
+      resolvedCarId = carId;
+    } else if (carId) {
+      setSelectedCarId(carId);
+    }
     setCurrentPage(page);
+
     try {
-      const url = page === 'home' ? '/' : `/${page}`;
-      if (window.location.pathname !== url) {
-        window.history.pushState(null, '', url);
+      let targetUrl = '/';
+      if (page === 'car-details') {
+        targetUrl = `/cars/${resolvedCarId || 'premium-suv-prado'}`;
+      } else if (page === 'home') {
+        targetUrl = '/';
+      } else if (page === 'fleet') {
+        targetUrl = '/fleet';
+      } else if (page === 'booking') {
+        targetUrl = resolvedCarId && resolvedCarId !== 'premium-suv-prado' ? `/booking?car=${resolvedCarId}` : '/booking';
+      } else {
+        targetUrl = `/${page}`;
       }
-    } catch {}
+
+      const currentFullPath = window.location.pathname + window.location.search;
+      if (currentFullPath !== targetUrl) {
+        window.history.pushState({ page, carId: resolvedCarId }, '', targetUrl);
+      }
+    } catch (e) {
+      console.warn('[Router] Navigation pushState warning:', e);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

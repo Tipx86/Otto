@@ -115,16 +115,48 @@ export default function CarDetailsPage() {
 
   return (
     <div className="bg-slate-50 min-h-screen text-slate-900 pt-28 pb-20 animate-fade-in">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         
-        {/* Back Link */}
-        <button
-          onClick={() => navigateTo('fleet')}
-          className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1 transition-colors uppercase tracking-wider cursor-pointer"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          <span>Back to All Vehicles</span>
-        </button>
+        {/* Semantic Breadcrumbs & Back Link */}
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-500">
+            <a
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateTo('home');
+              }}
+              className="hover:text-blue-600 transition-colors"
+            >
+              Home
+            </a>
+            <span className="text-slate-300">/</span>
+            <a
+              href="/fleet"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateTo('fleet');
+              }}
+              className="hover:text-blue-600 transition-colors"
+            >
+              Fleet Catalog
+            </a>
+            <span className="text-slate-300">/</span>
+            <span className="text-slate-800 font-semibold truncate max-w-xs">{car.name}</span>
+          </nav>
+
+          <a
+            href="/fleet"
+            onClick={(e) => {
+              e.preventDefault();
+              navigateTo('fleet');
+            }}
+            className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1 transition-colors uppercase tracking-wider cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span>Back to All Vehicles</span>
+          </a>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
@@ -145,8 +177,12 @@ export default function CarDetailsPage() {
 
                 <img
                   src={images[activeImageIndex]}
-                  alt={`${car.name} - Photo ${activeImageIndex + 1}`}
+                  alt={`${car.name} (${car.model || car.brand}) photo ${activeImageIndex + 1} available for rental in Kenya`}
+                  width="800"
+                  height="500"
                   className="max-h-72 sm:max-h-80 w-auto object-contain relative z-10 filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
+                  loading="eager"
+                  decoding="async"
                 />
 
                 {/* Photo Index / Total Counter Pill */}
@@ -207,8 +243,11 @@ export default function CarDetailsPage() {
                       >
                         <img
                           src={imgUrl}
-                          alt=""
+                          alt={`${car.name} gallery thumbnail view ${idx + 1}`}
+                          width="100"
+                          height="68"
                           className="w-full h-full object-contain"
+                          loading="lazy"
                         />
                         {idx === 0 && (
                           <span className="absolute bottom-1 left-1 bg-slate-900/80 text-white text-[8px] px-1 rounded font-bold uppercase">
@@ -247,9 +286,9 @@ export default function CarDetailsPage() {
 
             {/* Technical Specs Strip */}
             <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-3">
-              <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">
+              <h2 className="font-bold text-xs uppercase tracking-wider text-slate-400">
                 Vehicle Specifications
-              </h3>
+              </h2>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <div className="p-3 bg-slate-50 rounded-xl">
@@ -273,9 +312,9 @@ export default function CarDetailsPage() {
 
             {/* Included Features */}
             <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-3">
-              <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">
+              <h2 className="font-bold text-xs uppercase tracking-wider text-slate-400">
                 Included Features & Perks
-              </h3>
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                 {car.features?.map((f, i) => (
                   <div key={i} className="flex items-center gap-2 text-slate-700">

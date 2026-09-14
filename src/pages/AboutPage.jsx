@@ -22,7 +22,7 @@ export default function AboutPage() {
         {/* Editorial Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider">
-            About OTTORENTAL
+            About OttoRental Kenya
           </span>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
             Kenya's Premier Self-Drive & Chauffeured Rental Marketplace
@@ -36,28 +36,36 @@ export default function AboutPage() {
         <div className="relative rounded-3xl overflow-hidden aspect-[21/9] bg-slate-900 shadow-md">
           <img
             src="https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1800&q=85"
-            alt="OTTORENTAL Fleet in Masai Mara"
+            alt="OttoRental Safari 4x4 Fleet in Masai Mara, Kenya"
+            width="1800"
+            height="770"
             className="w-full h-full object-cover"
+            loading="eager"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
           <div className="absolute bottom-6 left-6 right-6 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 text-white">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 block">Our Promise</span>
-              <h3 className="font-extrabold text-xl sm:text-2xl">Verified Operators & Roadside Rescue Guaranteed</h3>
+              <h2 className="font-extrabold text-xl sm:text-2xl">Verified Operators & Roadside Rescue Guaranteed</h2>
             </div>
-            <button
-              onClick={() => navigateTo('fleet')}
-              className="btn-otto-primary text-xs py-2.5 px-6 uppercase"
+            <a
+              href="/fleet"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateTo('fleet');
+              }}
+              className="btn-otto-primary text-xs py-2.5 px-6 uppercase inline-block cursor-pointer"
             >
               Explore Vehicles
-            </button>
+            </a>
           </div>
         </div>
 
         {/* Pillars Grid */}
         <div className="space-y-6">
           <div className="text-center max-w-2xl mx-auto space-y-1">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Why Rent with OTTORENTAL?</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Why Rent with OttoRental?</h2>
             <p className="text-xs sm:text-sm text-slate-500">Built for seamless mobility, trust, and transparent rates.</p>
           </div>
 
@@ -104,21 +112,29 @@ export default function AboutPage() {
         <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-sm text-center space-y-5 max-w-3xl mx-auto">
           <h3 className="text-2xl font-extrabold text-slate-900">Ready to hit the road?</h3>
           <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto">
-            From city runabouts in Nairobi to 4x4 safari Land Cruisers for the Masai Mara, OTTORENTAL has the perfect vehicle for your journey.
+            From city runabouts in Nairobi to 4x4 safari Land Cruisers for the Masai Mara, OttoRental has the perfect vehicle for your journey.
           </p>
           <div className="flex justify-center gap-3 pt-2">
-            <button
-              onClick={() => navigateTo('fleet')}
-              className="btn-otto-primary text-xs py-3 px-8 uppercase"
+            <a
+              href="/fleet"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateTo('fleet');
+              }}
+              className="btn-otto-primary text-xs py-3 px-8 uppercase inline-block cursor-pointer"
             >
               Browse Vehicles
-            </button>
-            <button
-              onClick={() => navigateTo('contact')}
-              className="px-6 py-3 rounded-full border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700"
+            </a>
+            <a
+              href="/contact"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateTo('contact');
+              }}
+              className="px-6 py-3 rounded-full border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 inline-block cursor-pointer"
             >
               Contact Concierge
-            </button>
+            </a>
           </div>
         </div>
 

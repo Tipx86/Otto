@@ -18,9 +18,14 @@ export default function CarCard({ car }) {
   const photoCount = car.images?.length || 1;
 
   return (
-    <div
-      onClick={handleCardClick}
-      className="otto-car-card p-5 flex flex-col justify-between cursor-pointer group bg-white text-slate-900 select-none"
+    <a
+      href={`/cars/${car.id}`}
+      onClick={(e) => {
+        e.preventDefault();
+        handleCardClick();
+      }}
+      className="otto-car-card p-5 flex flex-col justify-between cursor-pointer group bg-white text-slate-900 select-none block no-underline transition-all"
+      title={`Hire ${car.name} — ${car.model || car.brand} in Kenya`}
     >
       {/* Vehicle Studio Image with seamless backdrop, soft floor shadow & zoom */}
       <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50/90 via-white to-slate-100/60 border border-slate-100/80 flex items-center justify-center p-3 mb-3">
@@ -29,9 +34,12 @@ export default function CarCard({ car }) {
 
         <img
           src={car.images?.[0]}
-          alt={car.name}
+          alt={`${car.name} (${car.model || car.brand}) car hire in Nairobi Kenya`}
+          width="400"
+          height="250"
           className="w-full h-full object-contain relative z-10 filter drop-shadow-[0_4px_10px_rgba(0,0,0,0.06)] transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-1.5"
           loading="lazy"
+          decoding="async"
         />
 
         {photoCount > 1 && (
@@ -42,7 +50,7 @@ export default function CarCard({ car }) {
         )}
       </div>
 
-      {/* Car Info matching screenshot */}
+      {/* Car Info matching design */}
       <div className="space-y-1">
         <h3 className="font-bold text-sm text-slate-900 group-hover:text-blue-600 transition-colors leading-tight">
           {car.name}
@@ -54,6 +62,6 @@ export default function CarCard({ car }) {
           {formatPrice(car.dailyPrice, car.kshPrice)}<span className="text-xs font-normal text-slate-500">/day</span>
         </div>
       </div>
-    </div>
+    </a>
   );
 }

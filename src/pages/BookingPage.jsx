@@ -103,7 +103,7 @@ export default function BookingPage() {
       );
       return;
     }
-    setStep(2);
+    setStep(2); // skip add-ons, go straight to passenger details
   };
 
   // Pricing Calculation
@@ -158,7 +158,7 @@ export default function BookingPage() {
     };
   }, [selectedCar, pickupDate, returnDate, chauffeur, rentalMode, fullProtection, airportMeet, childSeat]);
 
-  const validateStep3 = () => {
+  const validateStep2 = () => {
     const errs = {};
     if (!fullName.trim()) errs.fullName = 'Full name is required';
     if (!email.trim() || !email.includes('@')) errs.email = 'Valid email is required';
@@ -203,7 +203,7 @@ Kindly confirm vehicle availability and handover details. Thank you!`;
 
   const handleSubmitBooking = (e) => {
     e.preventDefault();
-    if (!validateStep3()) return;
+    if (!validateStep2()) return;
 
     const newBooking = addBooking({
       carId: selectedCar.id,
@@ -237,7 +237,7 @@ Kindly confirm vehicle availability and handover details. Thank you!`;
 
     trackPurchase(newBooking);
     setConfirmedBooking(newBooking);
-    setStep(4);
+    setStep(3);
 
     try {
       confetti({
@@ -263,23 +263,22 @@ Kindly confirm vehicle availability and handover details. Thank you!`;
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto space-y-1">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            {step === 4 ? 'Booking Request Submitted!' : 'Reserve your vehicle'}
+            {step === 3 ? 'Booking Request Submitted!' : 'Reserve your vehicle'}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500">
-            {step === 4 
+            {step === 3 
               ? 'Your booking details have been submitted and sent to our WhatsApp Concierge desk.'
               : 'Verified operators, transparent pricing, direct WhatsApp reservation.'}
           </p>
         </div>
 
-        {/* Stepper (1 to 3) */}
-        {step < 4 && (
-          <div className="max-w-xl mx-auto flex items-center justify-between relative px-2">
+        {/* Stepper (1 to 2) */}
+        {step < 3 && (
+          <div className="max-w-sm mx-auto flex items-center justify-between relative px-2">
             <div className="absolute top-4 left-6 right-6 h-0.5 bg-slate-200 -translate-y-1/2 z-0"></div>
             {[
               { num: 1, title: 'Vehicle' },
-              { num: 2, title: 'Add-ons' },
-              { num: 3, title: 'Passenger Details' }
+              { num: 2, title: 'Passenger Details' }
             ].map((item) => (
               <div key={item.num} className="relative z-10 flex flex-col items-center">
                 <div 
@@ -304,7 +303,7 @@ Kindly confirm vehicle availability and handover details. Thank you!`;
         )}
 
         {/* Flow Content */}
-        {step < 4 ? (
+        {step < 3 ? (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
             {/* Form Steps (7 cols) */}
@@ -446,105 +445,6 @@ Kindly confirm vehicle availability and handover details. Thank you!`;
                       onClick={validateStep1AndContinue}
                       className="btn-otto-primary text-xs py-3 px-6"
                     >
-                      <span>Continue to Add-ons</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Step 2: Add-ons */}
-              {step === 2 && (
-                <div className="space-y-4 animate-fade-in">
-                  <div className="border-b border-slate-100 pb-3">
-                    <h3 className="font-bold text-base text-slate-900">
-                      Step 2: Protection & Add-ons
-                    </h3>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200 cursor-pointer">
-                      <div className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          checked={fullProtection}
-                          onChange={(e) => setFullProtection(e.target.checked)}
-                          className="w-4 h-4 accent-blue-600 rounded mt-0.5"
-                        />
-                        <div>
-                          <span className="font-bold text-xs text-slate-900 block">Zero Excess Damage Waiver</span>
-                          <span className="text-[11px] text-slate-500">Covers tires, glass, and bodywork with zero liability.</span>
-                        </div>
-                      </div>
-                      <span className="text-xs font-bold text-slate-900 whitespace-nowrap">+ KSh 1,200/day</span>
-                    </label>
-
-                    <label className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors">
-                      <div className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          checked={chauffeur || rentalMode === 'chauffeured'}
-                          onChange={(e) => {
-                            const checked = e.target.checked;
-                            setChauffeur(checked);
-                            setRentalMode(checked ? 'chauffeured' : 'self-drive');
-                          }}
-                          className="w-4 h-4 accent-blue-600 rounded mt-0.5 cursor-pointer"
-                        />
-                        <div>
-                          <span className="font-bold text-xs text-slate-900 block">Vetted Driver / Chauffeur</span>
-                          <span className="text-[11px] text-slate-500">Professional, smartly dressed driver for city or safari.</span>
-                        </div>
-                      </div>
-                      <span className="text-xs font-bold text-slate-900 whitespace-nowrap">+ KSh 2,500/day</span>
-                    </label>
-
-                    <label className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200 cursor-pointer">
-                      <div className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          checked={airportMeet}
-                          onChange={(e) => setAirportMeet(e.target.checked)}
-                          className="w-4 h-4 accent-blue-600 rounded mt-0.5"
-                        />
-                        <div>
-                          <span className="font-bold text-xs text-slate-900 block">Airport Terminal Meet & Greet</span>
-                          <span className="text-[11px] text-slate-500">Driver awaits at arrivals with nameboard and assists with luggage.</span>
-                        </div>
-                      </div>
-                      <span className="text-xs font-bold text-slate-900 whitespace-nowrap">+ KSh 2,000 once</span>
-                    </label>
-
-                    <label className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200 cursor-pointer">
-                      <div className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          checked={childSeat}
-                          onChange={(e) => setChildSeat(e.target.checked)}
-                          className="w-4 h-4 accent-blue-600 rounded mt-0.5"
-                        />
-                        <div>
-                          <span className="font-bold text-xs text-slate-900 block">Child Safety Seat</span>
-                          <span className="text-[11px] text-slate-500">Comfortable certified infant/toddler car seat.</span>
-                        </div>
-                      </div>
-                      <span className="text-xs font-bold text-slate-900 whitespace-nowrap">+ KSh 500/day</span>
-                    </label>
-                  </div>
-
-                  <div className="pt-3 flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={() => setStep(1)}
-                      className="px-5 py-2.5 rounded-full border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50"
-                    >
-                      Back
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setStep(3)}
-                      className="btn-otto-primary text-xs py-3 px-6"
-                    >
                       <span>Continue to Details</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
@@ -552,12 +452,12 @@ Kindly confirm vehicle availability and handover details. Thank you!`;
                 </div>
               )}
 
-              {/* Step 3: Passenger & Booking Details (Matching Screenshot 2) */}
-              {step === 3 && (
+              {/* Step 2: Passenger & Booking Details */}
+              {step === 2 && (
                 <form onSubmit={handleSubmitBooking} className="space-y-4 animate-fade-in">
                   <div className="border-b border-slate-100 pb-3">
                     <h3 className="font-bold text-base text-slate-900">
-                      Step 3: Passenger Details
+                      Step 2: Passenger Details
                     </h3>
                   </div>
 
@@ -620,7 +520,7 @@ Kindly confirm vehicle availability and handover details. Thank you!`;
                   <div className="pt-4 flex items-center justify-between">
                     <button
                       type="button"
-                      onClick={() => setStep(2)}
+                      onClick={() => setStep(1)}
                       className="px-5 py-2.5 rounded-full border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50"
                     >
                       Back

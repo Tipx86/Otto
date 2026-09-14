@@ -37,9 +37,13 @@
     <meta name="twitter:description" content="Self-drive or chauffeured vehicles in Kenya. Toyota Prado, Land Cruiser, Mercedes, Safari Vans. Book via WhatsApp." />
     <meta name="twitter:image" content="https://ottorental.com/kisumu-lake.jpg" />
 
-    <!-- ══ Favicon & App Icons ═══════════════════════════════════════════════ -->
+    <!-- ══ Favicon & Google Search Icon Stack ════════════════════════════════ -->
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/logo-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/logo-512.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/logo-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo-192.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#2563eb" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -56,18 +60,19 @@
     <!-- ══ Google Fonts ══════════════════════════════════════════════════════ -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
 
-    <!-- ══ Core JSON-LD: LocalBusiness (static, loads immediately) ══════════ -->
-    <script type="application/ld+json">
+    <!-- ══ Core JSON-LD: LocalBusiness (static fallback, hydrated dynamically) ══ -->
+    <script id="schema-localbusiness" type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": ["LocalBusiness", "CarRental"],
+      "@type": ["AutoRental", "CarRental", "LocalBusiness"],
       "name": "OttoRental",
+      "legalName": "OttoRental Kenya Ltd",
       "description": "Premium self-drive and chauffeured car hire in Kenya. Book a Toyota Prado, Land Cruiser, Mercedes, safari van, and more across Nairobi, Mombasa, Kisumu, and upcountry Kenya.",
       "url": "https://ottorental.com",
       "telephone": "+254119317161",
-      "email": "reservations@ottorental.com",
-      "logo": "https://ottorental.com/favicon.svg",
-      "image": "https://ottorental.com/kisumu-lake.jpg",
+      "email": "hello@ottorental.com",
+      "logo": "https://ottorental.com/logo-512.png",
+      "image": "https://ottorental.com/logo-512.png",
       "priceRange": "KSh 4,500 – KSh 35,000/day",
       "currenciesAccepted": "KES, USD",
       "paymentAccepted": "M-Pesa, Bank Transfer, Cash",

@@ -341,12 +341,16 @@ export default function HomePage() {
 
         {/* View All Vehicles Button */}
         <div className="text-center pt-4">
-          <button
-            onClick={() => navigateTo('fleet')}
-            className="px-6 py-2.5 rounded-full border border-slate-300 hover:border-slate-400 text-xs font-bold text-slate-800 bg-white shadow-sm hover:bg-slate-50 transition-all uppercase cursor-pointer"
+          <a
+            href="/fleet"
+            onClick={(e) => {
+              e.preventDefault();
+              navigateTo('fleet');
+            }}
+            className="inline-block px-6 py-2.5 rounded-full border border-slate-300 hover:border-slate-400 text-xs font-bold text-slate-800 bg-white shadow-sm hover:bg-slate-50 transition-all uppercase cursor-pointer no-underline"
           >
             View all vehicles
-          </button>
+          </a>
         </div>
 
       </section>
@@ -366,19 +370,25 @@ export default function HomePage() {
         {/* 3-Column Destination Card Grid with Overlaid Titles */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
           {CITIES_WE_SERVE.map((city, idx) => (
-            <div 
+            <a 
               key={idx}
-              onClick={() => {
+              href="/fleet"
+              onClick={(e) => {
+                e.preventDefault();
                 setStartLocation(city.name);
                 navigateTo('fleet');
               }}
-              className="destination-card group cursor-pointer shadow-md bg-slate-900"
+              className="destination-card group cursor-pointer shadow-md bg-slate-900 block"
+              title={`Car rental in ${city.name}, Kenya`}
             >
               <img
                 src={city.image}
-                alt={city.name}
+                alt={`Car rental and safari tours in ${city.name}, Kenya`}
+                width="600"
+                height="400"
                 className="transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
+                decoding="async"
               />
               <div className="destination-card-gradient"></div>
               <div className="absolute bottom-4 left-4 text-white z-10">
@@ -389,7 +399,7 @@ export default function HomePage() {
                   {city.subtitle}
                 </p>
               </div>
-            </div>
+            </a>
           ))}
         </div>
 
@@ -433,7 +443,7 @@ export default function HomePage() {
                   {rev.initials}
                 </div>
                 <div>
-                  <h4 className="font-bold text-xs text-slate-900">{rev.name}</h4>
+                  <div className="font-bold text-xs text-slate-900">{rev.name}</div>
                   <p className="text-[11px] text-slate-500">{rev.role}</p>
                 </div>
               </div>
@@ -462,18 +472,26 @@ export default function HomePage() {
                 {siteContent.earnSection?.description}
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
-                <button
-                  onClick={() => navigateTo('contact')}
-                  className="px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors cursor-pointer"
+                <a
+                  href="/contact"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigateTo('contact');
+                  }}
+                  className="px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors cursor-pointer inline-block"
                 >
                   {siteContent.earnSection?.cta1 || 'Start earning'}
-                </button>
-                <button
-                  onClick={() => navigateTo('about')}
-                  className="px-6 py-3 rounded-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition-colors border border-slate-700 cursor-pointer"
+                </a>
+                <a
+                  href="/about"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigateTo('about');
+                  }}
+                  className="px-6 py-3 rounded-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition-colors border border-slate-700 cursor-pointer inline-block"
                 >
                   {siteContent.earnSection?.cta2 || 'See how it works'}
-                </button>
+                </a>
               </div>
             </div>
 
@@ -481,7 +499,7 @@ export default function HomePage() {
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {siteContent.earnSection?.cards.map((card, idx) => (
                 <div key={idx} className="p-5 rounded-2xl bg-[#161826] border border-slate-800/80 space-y-2">
-                  <h4 className="font-bold text-sm text-white">{card.title}</h4>
+                  <h3 className="font-bold text-sm text-white">{card.title}</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">{card.text}</p>
                 </div>
               ))}
@@ -500,7 +518,7 @@ export default function HomePage() {
             <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {siteContent.operatorSection?.cards.map((card, idx) => (
                 <div key={idx} className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                  <h4 className="font-bold text-sm text-slate-900">{card.title}</h4>
+                  <h3 className="font-bold text-sm text-slate-900">{card.title}</h3>
                   <p className="text-xs text-slate-600 leading-relaxed">{card.text}</p>
                 </div>
               ))}
@@ -518,18 +536,26 @@ export default function HomePage() {
                 {siteContent.operatorSection?.description}
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
-                <button
-                  onClick={() => navigateTo('contact')}
-                  className="px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors cursor-pointer"
+                <a
+                  href="/contact"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigateTo('contact');
+                  }}
+                  className="px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors cursor-pointer inline-block"
                 >
                   {siteContent.operatorSection?.cta1 || 'Explore GoBookKit'}
-                </button>
-                <button
-                  onClick={() => navigateTo('contact')}
-                  className="px-6 py-3 rounded-full border border-slate-300 hover:bg-slate-50 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
+                </a>
+                <a
+                  href="/contact"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigateTo('contact');
+                  }}
+                  className="px-6 py-3 rounded-full border border-slate-300 hover:bg-slate-50 text-slate-800 font-bold text-xs transition-colors cursor-pointer inline-block"
                 >
                   {siteContent.operatorSection?.cta2 || 'List your fleet'}
-                </button>
+                </a>
               </div>
             </div>
 
@@ -554,18 +580,26 @@ export default function HomePage() {
                 {siteContent.businessSection?.description}
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
-                <button
-                  onClick={() => navigateTo('contact')}
-                  className="px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors cursor-pointer"
+                <a
+                  href="/contact"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigateTo('contact');
+                  }}
+                  className="px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors cursor-pointer inline-block"
                 >
                   {siteContent.businessSection?.cta1 || 'Talk to sales'}
-                </button>
-                <button
-                  onClick={() => navigateTo('about')}
-                  className="px-6 py-3 rounded-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition-colors border border-slate-700 cursor-pointer"
+                </a>
+                <a
+                  href="/about"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigateTo('about');
+                  }}
+                  className="px-6 py-3 rounded-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition-colors border border-slate-700 cursor-pointer inline-block"
                 >
                   {siteContent.businessSection?.cta2 || 'See how it works'}
-                </button>
+                </a>
               </div>
             </div>
 
@@ -573,7 +607,7 @@ export default function HomePage() {
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {siteContent.businessSection?.cards.map((card, idx) => (
                 <div key={idx} className="p-5 rounded-2xl bg-[#161826] border border-slate-800/80 space-y-2">
-                  <h4 className="font-bold text-sm text-white">{card.title}</h4>
+                  <h3 className="font-bold text-sm text-white">{card.title}</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">{card.text}</p>
                 </div>
               ))}

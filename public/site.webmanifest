@@ -32,14 +32,14 @@
       "name": "Book a Car",
       "short_name": "Book Now",
       "description": "Go directly to car booking",
-      "url": "/?page=booking",
+      "url": "/booking",
       "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Browse Fleet",
       "short_name": "Fleet",
       "description": "Browse our full vehicle fleet",
-      "url": "/?page=fleet",
+      "url": "/fleet",
       "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }]
     }
   ]

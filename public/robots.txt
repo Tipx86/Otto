@@ -1,12 +1,29 @@
-# Robots.txt for OttoRental — Car Rental Kenya
-# https://ottorental.com/robots.txt
+# Robots.txt for OttoRental Kenya (https://ottorental.com)
+# Verified Car Rental & Safari Vehicles in Kenya
+
+User-agent: Googlebot
+User-agent: Googlebot-Image
+User-agent: Bingbot
+User-agent: Applebot
+User-agent: Twitterbot
+User-agent: facebookexternalhit
+Allow: /
+Allow: /cars/
+Allow: /fleet
+Allow: /booking
+Allow: /about
+Allow: /contact
+Allow: /faqs
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
 
 User-agent: *
 Allow: /
-
-# Sitemap location
-Sitemap: https://ottorental.com/sitemap.xml
-
-# Block admin and internal pages from indexing
 Disallow: /admin
 Disallow: /admin/
+Disallow: /api/
+
+# Canonical XML Sitemap
+Sitemap: https://ottorental.com/sitemap.xml
+Host: https://ottorental.com

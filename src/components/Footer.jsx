@@ -23,9 +23,14 @@ export default function Footer() {
             
             {/* Brand Col */}
             <div className="lg:col-span-2 space-y-4">
-              <div 
-                onClick={() => navigateTo('home')}
+              <a 
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateTo('home');
+                }}
                 className="flex items-center gap-2.5 cursor-pointer select-none group"
+                aria-label="OttoRental Home"
               >
                 <div className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-slate-900 transition-transform group-hover:scale-110">
                   <svg viewBox="0 0 100 100" className="w-full h-full fill-none">
@@ -34,10 +39,10 @@ export default function Footer() {
                   </svg>
                 </div>
                 <span className="font-extrabold text-2xl sm:text-3xl tracking-tight text-slate-900 font-sans">
-                  Elite<span className="text-blue-600">Ride</span>
+                  Otto<span className="text-blue-600">Rental</span>
                 </span>
                 <span className="w-2 h-2 rounded-full bg-emerald-500 mt-2"></span>
-              </div>
+              </a>
               <p className="text-slate-500 text-xs leading-relaxed max-w-sm">
                 Self-drive, chauffeured, and safari vehicle rentals across Kenya. Verified operators, transparent prices, pay with M-Pesa or card.
               </p>
@@ -46,7 +51,7 @@ export default function Footer() {
                   href={`https://api.whatsapp.com/send?phone=${(siteContent.brand?.whatsapp || '254119317161').replace(/[^0-9]/g, '')}&text=${encodeURIComponent('Hello OttoRental, I would like to make an enquiry on available vehicles.')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 font-bold"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 font-bold hover:bg-emerald-100 transition-colors"
                 >
                   <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
                   <span>WhatsApp Support</span>
@@ -57,14 +62,54 @@ export default function Footer() {
             {/* Vehicles Links */}
             <div className="space-y-3">
               <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
-                Vehicles
+                Vehicles for Hire
               </h4>
               <ul className="space-y-2">
-                <li><button onClick={() => navigateTo('fleet')} className="hover:text-blue-600 transition-colors">Small & Medium Cars</button></li>
-                <li><button onClick={() => navigateTo('fleet')} className="hover:text-blue-600 transition-colors">Mid-Size & Luxury SUVs</button></li>
-                <li><button onClick={() => navigateTo('fleet')} className="hover:text-blue-600 transition-colors">Masai Mara 4x4 Cruisers</button></li>
-                <li><button onClick={() => navigateTo('fleet')} className="hover:text-blue-600 transition-colors">Executive Minivans & Buses</button></li>
-                <li><button onClick={() => navigateTo('fleet')} className="hover:text-blue-600 transition-colors">Supercars & Limousines</button></li>
+                <li>
+                  <a 
+                    href="/fleet" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('fleet'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    Economy Small & Medium Cars
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/cars/premium-suv-prado" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('car-details', 'premium-suv-prado'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    Toyota Prado TX 4x4
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/cars/luxury-suv-lc200" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('car-details', 'luxury-suv-lc200'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    Land Cruiser V8 LC200
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/cars/standard-safari" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('car-details', 'standard-safari'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    Masai Mara Safari Land Cruisers
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/cars/premium-minivan" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('car-details', 'premium-minivan'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    Executive Minivans & Buses
+                  </a>
+                </li>
               </ul>
             </div>
 
@@ -74,25 +119,105 @@ export default function Footer() {
                 Top Destinations
               </h4>
               <ul className="space-y-2">
-                <li><button onClick={() => navigateTo('fleet')} className="hover:text-blue-600 transition-colors">Nairobi & JKIA Airport</button></li>
-                <li><button onClick={() => navigateTo('fleet')} className="hover:text-blue-600 transition-colors">Mombasa & Diani Beach</button></li>
-                <li><button onClick={() => navigateTo('fleet')} className="hover:text-blue-600 transition-colors">Kisumu Lakeside</button></li>
-                <li><button onClick={() => navigateTo('fleet')} className="hover:text-blue-600 transition-colors">Masai Mara & Naivasha</button></li>
-                <li><button onClick={() => navigateTo('fleet')} className="hover:text-blue-600 transition-colors">Malindi Coastal Escape</button></li>
+                <li>
+                  <a 
+                    href="/fleet" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('fleet'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    Nairobi & JKIA Airport
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/fleet" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('fleet'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    Mombasa & Diani Beach
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/fleet" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('fleet'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    Kisumu Lakeside City
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/fleet" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('fleet'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    Masai Mara & Naivasha
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/fleet" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('fleet'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    Malindi Coastal Escape
+                  </a>
+                </li>
               </ul>
             </div>
 
             {/* Company & Operators */}
             <div className="space-y-3">
               <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
-                Operators & Business
+                About & Operators
               </h4>
               <ul className="space-y-2">
-                <li><button onClick={() => navigateTo('contact')} className="hover:text-blue-600 transition-colors">Become an Operator</button></li>
-                <li><button onClick={() => navigateTo('about')} className="hover:text-blue-600 transition-colors">OTTORENTAL for Business</button></li>
-                <li><button onClick={() => navigateTo('about')} className="hover:text-blue-600 transition-colors">Earn with OTTORENTAL</button></li>
-                <li><button onClick={() => navigateTo('faqs')} className="hover:text-blue-600 transition-colors">Rental FAQs & Terms</button></li>
-                <li><button onClick={() => navigateTo('contact')} className="hover:text-blue-600 transition-colors">Concierge Desk</button></li>
+                <li>
+                  <a 
+                    href="/about" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('about'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    About OttoRental Kenya
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/contact" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('contact'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    Become an Operator / List Fleet
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/booking" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('booking'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    Online Booking & Checkout
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/faqs" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('faqs'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    Rental FAQs & Policies
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/contact" 
+                    onClick={(e) => { e.preventDefault(); navigateTo('contact'); }} 
+                    className="hover:text-blue-600 transition-colors block"
+                  >
+                    24/7 Concierge Desk
+                  </a>
+                </li>
               </ul>
             </div>
 
@@ -113,13 +238,13 @@ export default function Footer() {
                 className="cursor-default select-none"
                 title=""
               >
-                {siteContent.brand.name || 'OttoRental'}
+                {siteContent.brand?.name || 'OttoRental'}
               </span>
-              . All rights reserved. Registered rental marketplace & operator logistics.
+              . All rights reserved. Registered rental marketplace & operator logistics in Kenya.
             </p>
 
             <div className="flex items-center gap-3 text-slate-400 text-[11px]">
-              <span>Nairobi · Mombasa · Kisumu</span>
+              <span>Nairobi · Mombasa · Kisumu · Diani · Malindi</span>
               {isAdminAuthenticated && (
                 <button
                   onClick={() => navigateTo('admin')}

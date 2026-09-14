@@ -42,8 +42,8 @@ function MainRouter() {
     })();
 
     const pageTitle = selectedCar 
-      ? `${selectedCar.name} | OTTORENTAL Kenya`
-      : (document.title || `OTTORENTAL - ${currentPage}`);
+      ? `${selectedCar.name} — ${selectedCar.model || selectedCar.brand} | OttoRental Kenya`
+      : (document.title || `OttoRental — ${currentPage.toUpperCase()}`);
 
     const trackingKey = `${routePath}::${pageTitle}`;
     if (lastTrackedRef.current !== trackingKey) {
@@ -52,15 +52,15 @@ function MainRouter() {
     }
   }, [currentPage, selectedCarId, selectedCar]);
 
-  // Map internal page names to SEO page keys
+  // Map internal page names to dedicated SEO page keys
   const seoPage = (() => {
     switch (currentPage) {
       case 'car-details': return 'car';
       case 'fleet':       return 'fleet';
       case 'booking':     return 'booking';
       case 'contact':     return 'contact';
-      case 'about':       return 'contact'; // reuse contact meta (similar intent)
-      case 'faqs':        return 'contact';
+      case 'about':       return 'about';
+      case 'faqs':        return 'faqs';
       case 'admin':       return null;      // don't index admin
       default:            return 'home';
     }

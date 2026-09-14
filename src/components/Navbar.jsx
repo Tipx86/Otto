@@ -7,14 +7,21 @@ import {
   ChevronDown, 
   Globe, 
   Car, 
-  MapPin, 
-  Briefcase, 
-  HelpCircle, 
-  Phone,
-  ShieldCheck,
-  Building2
+  ShieldCheck, 
+  Building2, 
+  Phone, 
+  HelpCircle 
 } from 'lucide-react';
 import AdminLoginModal from './AdminLoginModal';
+
+const NAV_LINKS = [
+  { id: 'home', href: '/', label: 'Home', icon: Globe },
+  { id: 'fleet', href: '/fleet', label: 'Every Kind of Vehicle', icon: Car },
+  { id: 'booking', href: '/booking', label: 'Book a Rental', icon: ShieldCheck },
+  { id: 'about', href: '/about', label: 'About Us', icon: Building2 },
+  { id: 'contact', href: '/contact', label: 'Concierge & Operator Portal', icon: Phone },
+  { id: 'faqs', href: '/faqs', label: 'Rental FAQs & Terms', icon: HelpCircle }
+];
 
 export default function Navbar() {
   const { 
@@ -61,9 +68,14 @@ export default function Navbar() {
       }`}>
         
         {/* Brand Logo - Official bullseye mark + bold typography */}
-        <div 
-          onClick={() => handleNavClick('home')}
+        <a 
+          href="/"
+          onClick={(e) => {
+            e.preventDefault();
+            handleNavClick('home');
+          }}
           className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group select-none"
+          aria-label="OttoRental Home"
         >
           <div className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center transition-transform group-hover:scale-110">
             <svg viewBox="0 0 100 100" className="w-full h-full fill-none">
@@ -74,23 +86,27 @@ export default function Navbar() {
           <span className={`font-extrabold text-2xl sm:text-3xl tracking-tight font-sans ${
             isHomePage ? 'text-white' : 'text-slate-900'
           }`}>
-            Elite<span className="text-blue-600">Ride</span>
+            Otto<span className="text-blue-600">Rental</span>
           </span>
           <span className="w-2 h-2 rounded-full bg-emerald-500 mt-2"></span>
-        </div>
+        </a>
 
         {/* Right Navigation Actions */}
         <div className="flex items-center gap-3 sm:gap-4">
           
           {/* Become an Operator / List Fleet */}
-          <button
-            onClick={() => handleNavClick('contact')}
+          <a
+            href="/contact"
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavClick('contact');
+            }}
             className={`hidden md:inline-flex items-center text-sm font-semibold transition-colors cursor-pointer px-3 py-1.5 ${
               isHomePage ? 'text-white/90 hover:text-white' : 'text-slate-700 hover:text-blue-600'
             }`}
           >
             Become an Operator
-          </button>
+          </a>
 
           {/* Currency Switcher Pill (e.g. KSh, USD, EUR) */}
           <div className="relative">
@@ -101,6 +117,7 @@ export default function Navbar() {
                   ? 'bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border-white/20'
                   : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
               }`}
+              aria-label="Select Currency"
             >
               <span>{currency === 'KSH' ? 'KSh' : currency}</span>
               <ChevronDown className="w-3 h-3 opacity-80" />
@@ -115,7 +132,7 @@ export default function Navbar() {
                       setCurrency(currKey);
                       setCurrencyOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2 hover:bg-slate-50 transition-colors flex items-center justify-between ${
+                    className={`w-full text-left px-4 py-2 hover:bg-slate-50 transition-colors flex items-center justify-between cursor-pointer ${
                       currency === currKey ? 'text-blue-600 font-bold bg-blue-50' : 'text-slate-700'
                     }`}
                   >
@@ -151,7 +168,14 @@ export default function Navbar() {
             
             <div className="space-y-8">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                <div className="flex items-center gap-2.5">
+                <a 
+                  href="/"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick('home');
+                  }}
+                  className="flex items-center gap-2.5 cursor-pointer"
+                >
                   <div className="w-7 h-7 flex items-center justify-center text-slate-900">
                     <svg viewBox="0 0 100 100" className="w-full h-full fill-none">
                       <circle cx="50" cy="50" r="36" stroke="currentColor" strokeWidth="15" />
@@ -162,37 +186,35 @@ export default function Navbar() {
                     Otto<span className="text-blue-600">Rental</span>
                   </span>
                   <span className="w-2 h-2 rounded-full bg-emerald-500 mt-1"></span>
-                </div>
+                </a>
                 <button
                   onClick={() => setMenuOpen(false)}
-                  className="p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900"
+                  className="p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 cursor-pointer"
+                  aria-label="Close menu"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <nav className="space-y-2">
-                {[
-                  { id: 'home', label: 'Home', icon: Globe },
-                  { id: 'fleet', label: 'Every Kind of Vehicle', icon: Car },
-                  { id: 'booking', label: 'Book a Rental', icon: ShieldCheck },
-                  { id: 'about', label: 'About Us', icon: Building2 },
-                  { id: 'contact', label: 'Concierge & Operator Portal', icon: Phone },
-                  { id: 'faqs', label: 'Rental FAQs & Terms', icon: HelpCircle }
-                ].map((item) => {
+                {NAV_LINKS.map((item) => {
                   const Icon = item.icon;
                   const isActive = currentPage === item.id;
                   return (
-                    <button
+                    <a
                       key={item.id}
-                      onClick={() => handleNavClick(item.id)}
+                      href={item.href}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavClick(item.id);
+                      }}
                       className={`w-full text-left p-3 rounded-xl text-sm font-semibold flex items-center gap-3 transition-colors ${
                         isActive ? 'bg-blue-600 text-white font-bold' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
                       }`}
                     >
                       <Icon className="w-4 h-4 opacity-75" />
                       <span>{item.label}</span>
-                    </button>
+                    </a>
                   );
                 })}
               </nav>
@@ -202,8 +224,8 @@ export default function Navbar() {
             <div className="pt-6 border-t border-slate-100 space-y-3 text-xs text-slate-500">
               <div className="flex items-center justify-between">
                 <span>Direct Hotline:</span>
-                <a href={`tel:${siteContent.brand.phone}`} className="text-slate-900 font-bold hover:text-blue-600">
-                  {siteContent.brand.phone}
+                <a href={`tel:${siteContent.brand?.phone || '+254119317161'}`} className="text-slate-900 font-bold hover:text-blue-600">
+                  {siteContent.brand?.phone || '+254 119 317161'}
                 </a>
               </div>
               <div className="flex items-center justify-between">

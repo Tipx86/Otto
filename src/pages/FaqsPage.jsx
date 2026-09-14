@@ -115,12 +115,16 @@ export default function FaqsPage() {
               <MessageCircle className="w-4 h-4" />
               <span>WhatsApp Support</span>
             </a>
-            <button
-              onClick={() => navigateTo('contact')}
-              className="px-5 py-2.5 rounded-full border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700"
+            <a
+              href="/contact"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateTo('contact');
+              }}
+              className="px-5 py-2.5 rounded-full border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 inline-block cursor-pointer"
             >
               Direct Inquiry
-            </button>
+            </a>
           </div>
         </div>
 
