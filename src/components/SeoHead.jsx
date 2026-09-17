@@ -7,7 +7,7 @@ import { useEffect } from 'react';
  * Usage: <SeoHead page="home|fleet|booking|contact|about|faqs|car" car={selectedCar} />
  */
 
-const SITE_URL = 'https://ottorental.com';
+const SITE_URL = 'https://www.ottorental.com';
 const BRAND_NAME = 'OttoRental';
 const PHONE = '+254 119 317161';
 const EMAIL = 'hello@ottorental.com';
@@ -16,7 +16,7 @@ const WHATSAPP = '+254 119 317161';
 // ── Multi-Location AutoRental & LocalBusiness Schema ───────────────────────
 const localBusinessSchema = {
   '@context': 'https://schema.org',
-  '@type': ['AutoRental', 'CarRental', 'LocalBusiness'],
+  '@type': ['Organization', 'AutoRental', 'CarRental', 'LocalBusiness'],
   name: BRAND_NAME,
   legalName: 'OttoRental Kenya Ltd',
   alternateName: ['Otto Rental', 'Otto Car Hire Kenya'],

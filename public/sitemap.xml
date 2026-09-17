@@ -5,225 +5,225 @@
 
   <!-- ══ Main Core Routes ══════════════════════════════════════════════ -->
   <url>
-    <loc>https://ottorental.com/</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://ottorental.com/kisumu-lake.jpg</image:loc>
+      <image:loc>https://www.ottorental.com/kisumu-lake.jpg</image:loc>
       <image:title>OttoRental Car Hire and Safari Rentals in Kenya</image:title>
       <image:caption>Premium self-drive and chauffeured vehicle hire across Kenya.</image:caption>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/fleet</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/fleet</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
 
   <url>
-    <loc>https://ottorental.com/booking</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/booking</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://ottorental.com/about</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/about</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <url>
-    <loc>https://ottorental.com/contact</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/contact</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <url>
-    <loc>https://ottorental.com/faqs</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/faqs</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <!-- ══ Individual Vehicle Landing Pages (16 Cars) ══════════════════════ -->
   <url>
-    <loc>https://ottorental.com/cars/economy-small-car</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/economy-small-car</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/economy-small-car.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/economy-small-car.png</image:loc>
       <image:title>Economy Small Car Rental — Mazda Demio Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/economy-medium-car</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/economy-medium-car</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/economy-medium-car.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/economy-medium-car.png</image:loc>
       <image:title>Economy Medium Sedan Rental — Toyota Axio Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/premium-medium-car</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/premium-medium-car</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/premium-medium-car.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/premium-medium-car.png</image:loc>
       <image:title>Premium Sedan Hire — Mercedes C 200 Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/luxury-medium-car</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/luxury-medium-car</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/luxury-medium-car.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/luxury-medium-car.png</image:loc>
       <image:title>Luxury Executive Limousine — Mercedes S 350 Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/economy-mid-size-suv</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/economy-mid-size-suv</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/economy-mid-size-suv.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/economy-mid-size-suv.png</image:loc>
       <image:title>Economy 7-Seater SUV Hire — Nissan X-Trail Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/standard-mid-size-suv</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/standard-mid-size-suv</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/standard-mid-size-suv.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/standard-mid-size-suv.png</image:loc>
       <image:title>Standard Mid-Size SUV Hire — Mazda CX-5 AWD Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/premium-mid-size-suv</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/premium-mid-size-suv</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/premium-mid-size-suv.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/premium-mid-size-suv.png</image:loc>
       <image:title>Premium 3-Row 7-Seater SUV Hire — Mazda CX-8 Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/premium-suv-prado</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/premium-suv-prado</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/premium-suv-prado.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/premium-suv-prado.png</image:loc>
       <image:title>Toyota Prado TX/TXL 4x4 Rental in Nairobi Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/luxury-suv-lc200</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/luxury-suv-lc200</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/luxury-suv-lc200.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/luxury-suv-lc200.png</image:loc>
       <image:title>Toyota Land Cruiser V8 LC200 Luxury SUV Hire Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/economy-safari</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/economy-safari</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/economy-safari.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/economy-safari.png</image:loc>
       <image:title>Toyota Hiace Custom Safari Tour Van Rental Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/standard-safari</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/standard-safari</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/standard-safari.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/standard-safari.png</image:loc>
       <image:title>Toyota Land Cruiser 70 Series 4x4 Safari Expedition Vehicle Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/premium-pickup-truck</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/premium-pickup-truck</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/premium-pickup-truck.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/premium-pickup-truck.png</image:loc>
       <image:title>Toyota Hilux Double Cab 4x4 Pickup Truck Rental Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/standard-minivan</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/standard-minivan</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/standard-minivan.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/standard-minivan.png</image:loc>
       <image:title>Toyota Noah 7-Passenger Minivan Rental Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/premium-minivan</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/premium-minivan</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/premium-minivan.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/premium-minivan.png</image:loc>
       <image:title>Toyota Alphard VIP Executive Lounge Minivan Hire Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/standard-van</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/standard-van</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/standard-van.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/standard-van.png</image:loc>
       <image:title>Toyota Hiace 14-Passenger Van Rental Kenya</image:title>
     </image:image>
   </url>
 
   <url>
-    <loc>https://ottorental.com/cars/standard-bus</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://www.ottorental.com/cars/standard-bus</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <image:image>
-      <image:loc>https://ottorental.com/cars/standard-bus.png</image:loc>
+      <image:loc>https://www.ottorental.com/cars/standard-bus.png</image:loc>
       <image:title>Toyota Coaster 28-Passenger Coach Bus Hire Kenya</image:title>
     </image:image>
   </url>
