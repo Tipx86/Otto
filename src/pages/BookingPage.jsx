@@ -547,7 +547,7 @@ Kindly confirm vehicle availability and handover details. Thank you!`;
                   className="w-20 h-14 object-contain bg-slate-50 rounded-xl p-1"
                   onError={(e) => {
                     const fallback = (selectedCar.images || []).find((img, i) => i > 0 && img !== e.target.src)
-                      || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80';
+                      || `/cars/${selectedCar.id}.png`;
                     if (e.target.src !== fallback) e.target.src = fallback;
                   }}
                 />

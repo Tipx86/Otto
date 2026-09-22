@@ -1,8 +1,11 @@
 import { Client, Databases, Storage, Account } from 'appwrite';
 
+const ENDPOINT = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_APPWRITE_ENDPOINT) || 'https://fra.cloud.appwrite.io/v1';
+const PROJECT_ID = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_APPWRITE_PROJECT_ID) || '6ab2b89c00003bec9a51';
+
 const client = new Client()
-  .setEndpoint(import.meta.env.VITE_APPWRITE_ENDPOINT || 'https://fra.cloud.appwrite.io/v1')
-  .setProject(import.meta.env.VITE_APPWRITE_PROJECT_ID || '6ab2b89c00003bec9a51');
+  .setEndpoint(ENDPOINT)
+  .setProject(PROJECT_ID);
 
 export { client };
 export const databases = new Databases(client);

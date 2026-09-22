@@ -41,11 +41,11 @@ export default function CarCard({ car }) {
           loading="lazy"
           decoding="async"
           onError={(e) => {
-            // Try subsequent images in order; last resort: Unsplash generic car
+            const studioFallback = `/cars/${car.id}.png`;
             const fallbacks = [
               ...(car.images || []).slice(1),
-              'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80'
-            ];
+              studioFallback
+            ].filter(Boolean);
             const tried = parseInt(e.target.dataset.fallbackIdx || '0', 10);
             if (tried < fallbacks.length) {
               e.target.dataset.fallbackIdx = String(tried + 1);

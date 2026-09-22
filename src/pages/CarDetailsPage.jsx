@@ -184,11 +184,12 @@ export default function CarDetailsPage() {
                   loading="eager"
                   decoding="async"
                   onError={(e) => {
+                    const studioFallback = `/cars/${car.id}.png`;
                     const fallbacks = [
                       ...images.slice(activeImageIndex + 1),
                       ...images.slice(0, activeImageIndex),
-                      'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80'
-                    ];
+                      studioFallback
+                    ].filter(Boolean);
                     const tried = parseInt(e.target.dataset.fallbackIdx || '0', 10);
                     if (tried < fallbacks.length) {
                       e.target.dataset.fallbackIdx = String(tried + 1);
@@ -518,7 +519,7 @@ export default function CarDetailsPage() {
                 alt={`${car.name} photo`}
                 className="max-h-[70vh] max-w-full object-contain drop-shadow-2xl transition-all duration-300"
                 onError={(e) => {
-                  const fallback = 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80';
+                  const fallback = `/cars/${car.id}.png`;
                   if (e.target.src !== fallback) e.target.src = fallback;
                 }}
               />

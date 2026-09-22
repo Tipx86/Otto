@@ -1,16 +1,16 @@
 import { Client, Databases, Storage, ID } from 'appwrite';
 
-const ENDPOINT = import.meta.env.VITE_APPWRITE_ENDPOINT || 'https://fra.cloud.appwrite.io/v1';
-const PROJECT_ID = import.meta.env.VITE_APPWRITE_PROJECT_ID || '6ab2b89c00003bec9a51';
+const ENDPOINT = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_APPWRITE_ENDPOINT) || 'https://fra.cloud.appwrite.io/v1';
+const PROJECT_ID = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_APPWRITE_PROJECT_ID) || '6ab2b89c00003bec9a51';
 
 export const DATABASE_ID = 'otto-db';
 export const BUCKET_ID = 'fleet-photos';
 
 export const COLLECTIONS = {
-  FLEET: 'fleet',
-  SITE_CONTENT: 'site_content',
-  BOOKINGS: 'bookings',
-  INQUIRIES: 'inquiries'
+  FLEET: '6ab2c655000416c5ea2f',
+  SITE_CONTENT: '6ab2c85900052579c2b5',
+  BOOKINGS: '6ab2c911000b4b0f4f47',
+  INQUIRIES: '6ab2c9ec0037037595db'
 };
 
 const client = new Client()
@@ -184,7 +184,7 @@ export async function dbSaveBooking(bookingObj) {
     const id = bookingObj.bookingId || ID.unique();
     await databases.createDocument(DATABASE_ID, COLLECTIONS.BOOKINGS, id, {
       data: JSON.stringify(bookingObj),
-      status: bookingObj.status || 'confirmed',
+      Status: bookingObj.status || 'confirmed',
       createdAt: new Date().toISOString()
     });
     return { success: true };

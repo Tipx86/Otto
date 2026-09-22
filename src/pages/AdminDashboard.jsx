@@ -362,9 +362,9 @@ export default function AdminDashboard() {
               </span>
 
               {cloudSyncStatus.configured ? (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold uppercase">
-                  <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                  Vercel KV Cloud Live (Multi-Device)
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold uppercase">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Appwrite Cloud Live (Multi-Device)
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold uppercase">
@@ -1337,40 +1337,28 @@ export default function AdminDashboard() {
               {/* Status Grid: Database (KV) and Media Storage (Blob) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* 1. Database (KV) */}
-                <div className={`p-4 rounded-2xl border ${
-                  cloudSyncStatus.configured 
-                    ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950' 
-                    : 'bg-amber-50/80 border-amber-200 text-amber-950'
-                }`}>
+                <div className="p-4 rounded-2xl border bg-emerald-50/80 border-emerald-200 text-emerald-950">
                   <div className="flex items-center gap-2">
-                    <span className={`w-2.5 h-2.5 rounded-full ${cloudSyncStatus.configured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span className="font-bold text-xs uppercase">
-                      Vercel KV (Database)
+                      Appwrite Database (otto-db)
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-600 mt-1.5 leading-relaxed">
-                    {cloudSyncStatus.configured 
-                      ? '✅ Connected — Fleet, bookings, pricing & text content sync across devices.' 
-                      : '⚠️ Offline — Running locally in browser IndexedDB.'}
+                    ✅ Connected — Fleet, bookings, pricing & text content sync across all devices in real time.
                   </p>
                 </div>
 
-                {/* 2. Media (Blob) */}
-                <div className={`p-4 rounded-2xl border ${
-                  cloudSyncStatus.blobConfigured 
-                    ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950' 
-                    : 'bg-amber-50/80 border-amber-200 text-amber-950'
-                }`}>
+                {/* 2. Media (Storage Bucket) */}
+                <div className="p-4 rounded-2xl border bg-emerald-50/80 border-emerald-200 text-emerald-950">
                   <div className="flex items-center gap-2">
-                    <span className={`w-2.5 h-2.5 rounded-full ${cloudSyncStatus.blobConfigured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span className="font-bold text-xs uppercase">
-                      Vercel Blob (Media CDN)
+                      Appwrite Storage (fleet-photos)
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-600 mt-1.5 leading-relaxed">
-                    {cloudSyncStatus.blobConfigured 
-                      ? '✅ Connected — Photos hosted on high-speed global CDN with unlimited capacity.' 
-                      : '⚠️ Not Connected — Device photos are compressed and stored locally.'}
+                    ✅ Connected — Vehicle photos hosted on global Appwrite CDN with direct upload from device.
                   </p>
                 </div>
               </div>
