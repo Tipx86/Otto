@@ -310,13 +310,23 @@ export function AppProvider({ children }) {
         return true;
       } else {
         setCloudSyncStatus(prev => ({ ...prev, syncing: false, source: 'local' }));
-        showToast(result.error ? `Sync error: ${result.error}` : 'Saved locally. Check Supabase connection.', 'error');
+        const isNetworkErr = result.error && (result.error.includes('fetch') || result.error.includes('network') || result.error.includes('Network'));
+        if (isNetworkErr) {
+          showToast('Fleet saved locally. Cloud sync offline — visit supabase.com to resume your project.', 'gold');
+        } else {
+          showToast(result.error ? `Fleet sync error: ${result.error}` : 'Saved locally. Check Supabase connection.', 'error');
+        }
         return false;
       }
     } catch (err) {
       setCloudSyncStatus(prev => ({ ...prev, syncing: false }));
       console.warn('[Supabase Sync] Failed:', err);
-      showToast(`Sync failed: ${err.message || 'Unknown error'}`, 'error');
+      const isNetworkErr = err.message && (err.message.includes('fetch') || err.message.includes('network'));
+      if (!isNetworkErr) {
+        showToast(`Sync failed: ${err.message || 'Unknown error'}`, 'error');
+      } else {
+        showToast('Fleet saved locally. Cloud sync offline — visit supabase.com to resume your project.', 'gold');
+      }
       return false;
     }
   };
@@ -326,10 +336,17 @@ export function AppProvider({ children }) {
     try {
       const res = await dbSaveContent(dataToSend);
       if (res.success) {
-        showToast('Website content saved to Supabase!', 'success');
+        showToast('Website content saved to cloud! ✅', 'success');
         return true;
       }
-      showToast(res.error ? `Content sync error: ${res.error}` : 'Content sync failed', 'error');
+      // Distinguish network errors (Supabase paused) from real errors
+      const isNetworkErr = res.error && (res.error.includes('fetch') || res.error.includes('network') || res.error.includes('Network'));
+      if (isNetworkErr) {
+        // Silent — data is saved locally, just cloud is unreachable
+        console.warn('[Supabase] Content sync skipped: cloud offline');
+      } else {
+        showToast(res.error ? `Content sync error: ${res.error}` : 'Content sync failed', 'error');
+      }
       return false;
     } catch (err) {
       console.warn('[Supabase Content Sync] Failed:', err);
