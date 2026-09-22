@@ -20,6 +20,31 @@ import {
   dbSaveInquiry
 } from '../utils/supabase';
 
+const APP_ORIGIN = 'https://www.ottorental.com';
+
+/**
+ * Heals a fleet array by converting any relative or broken image paths
+ * to absolute URLs. Called when loading from Supabase to ensure all
+ * devices see working images regardless of what's stored in the cloud.
+ */
+function healFleetImages(fleetArray) {
+  if (!Array.isArray(fleetArray)) return fleetArray;
+  return fleetArray.map(car => {
+    if (!car || !Array.isArray(car.images)) return car;
+    const healed = car.images.map(img => {
+      if (!img || typeof img !== 'string') return img;
+      // Fix relative paths like /cars/foo.png -> absolute URL
+      if (img.startsWith('/cars/')) return `${APP_ORIGIN}${img}`;
+      // Fix placeholder images from failed uploads
+      if (img === '/placeholder-car.jpg' || img.startsWith('data:image/')) {
+        return `${APP_ORIGIN}/cars/${car.id}.png`;
+      }
+      return img;
+    });
+    return { ...car, images: healed };
+  });
+}
+
 const AppContext = createContext();
 
 const parseRouteFromLocation = () => {
@@ -144,7 +169,7 @@ export function AppProvider({ children }) {
           // Fleet
           const fleetResult = await dbLoadFleet();
           if (isMounted && fleetResult && Array.isArray(fleetResult.fleet) && fleetResult.fleet.length > 0) {
-            const cloudFleet = fleetResult.fleet;
+            const cloudFleet = healFleetImages(fleetResult.fleet);
             const cloudUpdatedAt = new Date(fleetResult.updatedAt || 0).getTime();
             const lastKnownCloudTs = Number(localStorage.getItem('otto_fleet_cloud_ts') || '0');
             const localHasData = idbFleet && Array.isArray(idbFleet) && idbFleet.length > 0;

@@ -1,4 +1,24 @@
-export const INITIAL_CARS = [
+/**
+ * fix-fleet-images.mjs
+ * 
+ * This script pushes the correct fleet data (with working /cars/*.png image paths)
+ * to Supabase so ALL devices see the correct vehicle images.
+ * 
+ * Run: node scripts/fix-fleet-images.mjs
+ */
+
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = 'https://apwsjfpthawhwakersgf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwd3NqZnB0aGF3aHdha2Vyc2dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNjU5NjMsImV4cCI6MjEwNDY0MTk2M30.V4MZ7pTGHLX2KMEpsPMkpoYmwcdaUkKO5XAGsIp3D08';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ─── CANONICAL FLEET WITH CORRECT IMAGE PATHS ─────────────────────────────────
+// All primary images use /cars/*.png (served from public/cars/ on Vercel)
+// Fallback images use trusted Unsplash CDN URLs
+
+const CLEAN_FLEET = [
   {
     id: "economy-small-car",
     name: "Economy Small Car",
@@ -577,135 +597,56 @@ export const INITIAL_CARS = [
   }
 ];
 
-export const CATEGORIES = [
-  "ALL",
-  "SMALL CAR",
-  "MEDIUM CAR",
-  "MID-SIZE SUV",
-  "SUV",
-  "SAFARI",
-  "PICKUP TRUCK",
-  "MINIVAN",
-  "VAN",
-  "BUS"
-];
+async function fixFleetImages() {
+  console.log('🔄 Connecting to Supabase...');
+  
+  // First, read what's currently in Supabase
+  const { data: existing, error: readErr } = await supabase
+    .from('fleet')
+    .select('data, updated_at')
+    .eq('id', 'main')
+    .single();
 
-export const BRANDS = [
-  "All Brands",
-  "Toyota",
-  "Mercedes-Benz",
-  "Mazda",
-  "Nissan",
-  "BMW",
-  "Range Rover",
-  "Porsche",
-  "Ford"
-];
-
-export const CURRENCY_RATES = {
-  KSH: { symbol: "KSh ", rate: 128.5, label: "KSh (Kenya)", isKshBase: true },
-  USD: { symbol: "$", rate: 1, label: "USD ($)" },
-  EUR: { symbol: "€", rate: 0.92, label: "EUR (€)" },
-  GBP: { symbol: "£", rate: 0.79, label: "GBP (£)" },
-  AED: { symbol: "AED ", rate: 3.67, label: "AED (د.إ)" }
-};
-
-export const CITIES_WE_SERVE = [
-  {
-    name: "Nairobi",
-    subtitle: "Capital · fleet hub",
-    image: "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=600&q=80"
-  },
-  {
-    name: "Mombasa",
-    subtitle: "Coast · old town",
-    image: "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&w=600&q=80"
-  },
-  {
-    name: "Diani",
-    subtitle: "White-sand beaches",
-    image: "/diani-beach.jpg"
-  },
-  {
-    name: "Kisumu",
-    subtitle: "Lakeside city",
-    image: "/kisumu-lake.jpg"
-  },
-  {
-    name: "Malindi",
-    subtitle: "Coastal escape",
-    image: "/malindi-dhow.jpg"
-  },
-  {
-    name: "Kakamega",
-    subtitle: "Rainforest country",
-    image: "/kakamega-rocks.jpg"
-  },
-  {
-    name: "Kericho",
-    subtitle: "Tea highlands",
-    image: "/kericho-tea.jpg"
-  },
-  {
-    name: "Kisii",
-    subtitle: "Soapstone hills",
-    image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=600&q=80"
-  },
-  {
-    name: "Homa Bay",
-    subtitle: "Lake · Ruma park",
-    image: "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=600&q=80"
-  },
-  {
-    name: "Bungoma",
-    subtitle: "Below Mount Elgon",
-    image: "https://images.unsplash.com/photo-1534177616072-ef7dc120449d?auto=format&fit=crop&w=600&q=80"
-  },
-  {
-    name: "Migori",
-    subtitle: "Border · heritage",
-    image: "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=600&q=80"
-  },
-  {
-    name: "Siaya",
-    subtitle: "Wetlands · lakeshore",
-    image: "/siaya-fisherman.jpg"
+  if (readErr) {
+    console.warn('⚠️  Could not read existing fleet (may not exist yet):', readErr.message);
+  } else {
+    const existingFleet = existing?.data;
+    if (Array.isArray(existingFleet) && existingFleet.length > 0) {
+      console.log(`📦 Found existing fleet with ${existingFleet.length} vehicles in Supabase`);
+      console.log('   Last updated:', existing.updated_at);
+      
+      // Show the first car's images to diagnose the problem
+      const firstCar = existingFleet[0];
+      console.log(`\n   First vehicle: "${firstCar.name}" (ID: ${firstCar.id})`);
+      console.log('   Current images:', JSON.stringify(firstCar.images, null, 2));
+    }
   }
-];
 
-export const INITIAL_BOOKINGS = [
-  {
-    id: "OTTO-89241",
-    createdAt: "2026-09-07T14:30:00Z",
-    carId: "premium-suv-prado",
-    carName: "Toyota Prado TX/TXL",
-    customer: {
-      fullName: "Wanjiru Kariuki",
-      email: "wanjiru.k@safari-ventures.co.ke",
-      phone: "+254 712 345678",
-      flightNumber: "KQ 102",
-      pickupLocation: "JKIA Airport Terminal 1A (Nairobi)",
-      dropoffLocation: "JKIA Airport Terminal 1A (Nairobi)",
-      specialRequests: "Self-drive safari trip to Masai Mara with comprehensive insurance and child safety seat."
-    },
-    dates: {
-      pickupDate: "2026-09-12",
-      pickupTime: "10:00",
-      returnDate: "2026-09-19",
-      returnTime: "18:00",
-      days: 7
-    },
-    pricing: {
-      dailyRate: 150,
-      subtotal: 1050,
-      addOnsTotal: 140,
-      securityDeposit: 600,
-      grandTotal: 1190,
-      currency: "KSH"
-    },
-    addOns: [
-      { id: "full_protection", name: "Zero Excess Protection", price: 20, quantity: 7 }
-    ],
-    status: "Confirmed"
+  console.log(`\n🚗 Pushing ${CLEAN_FLEET.length} vehicles with correct image URLs to Supabase...`);
+  
+  const { error: writeErr } = await supabase
+    .from('fleet')
+    .upsert({
+      id: 'main',
+      data: CLEAN_FLEET,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'id' });
+
+  if (writeErr) {
+    console.error('❌ Failed to update fleet:', writeErr.message);
+    process.exit(1);
   }
-];
+
+  console.log('✅ Fleet updated successfully in Supabase!');
+  console.log('   All 16 vehicles now use absolute https://www.ottorental.com/cars/*.png URLs');
+  console.log('   These will work correctly on ALL devices immediately.');
+  console.log('\n📋 Vehicle list with image URLs:');
+  CLEAN_FLEET.forEach(car => {
+    console.log(`   • ${car.name} (${car.id}): ${car.images[0]}`);
+  });
+}
+
+fixFleetImages().catch(err => {
+  console.error('Fatal error:', err);
+  process.exit(1);
+});

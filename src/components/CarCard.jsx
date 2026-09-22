@@ -40,6 +40,18 @@ export default function CarCard({ car }) {
           className="w-full h-full object-contain relative z-10 filter drop-shadow-[0_4px_10px_rgba(0,0,0,0.06)] transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-1.5"
           loading="lazy"
           decoding="async"
+          onError={(e) => {
+            // Try subsequent images in order; last resort: Unsplash generic car
+            const fallbacks = [
+              ...(car.images || []).slice(1),
+              'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80'
+            ];
+            const tried = parseInt(e.target.dataset.fallbackIdx || '0', 10);
+            if (tried < fallbacks.length) {
+              e.target.dataset.fallbackIdx = String(tried + 1);
+              e.target.src = fallbacks[tried];
+            }
+          }}
         />
 
         {photoCount > 1 && (

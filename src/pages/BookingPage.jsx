@@ -545,6 +545,11 @@ Kindly confirm vehicle availability and handover details. Thank you!`;
                   src={selectedCar.images?.[0]}
                   alt={selectedCar.name}
                   className="w-20 h-14 object-contain bg-slate-50 rounded-xl p-1"
+                  onError={(e) => {
+                    const fallback = (selectedCar.images || []).find((img, i) => i > 0 && img !== e.target.src)
+                      || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80';
+                    if (e.target.src !== fallback) e.target.src = fallback;
+                  }}
                 />
                 <div>
                   <h4 className="font-bold text-sm text-slate-900">{selectedCar.name}</h4>

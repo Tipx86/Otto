@@ -183,6 +183,18 @@ export default function CarDetailsPage() {
                   className="max-h-72 sm:max-h-80 w-auto object-contain relative z-10 filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                   loading="eager"
                   decoding="async"
+                  onError={(e) => {
+                    const fallbacks = [
+                      ...images.slice(activeImageIndex + 1),
+                      ...images.slice(0, activeImageIndex),
+                      'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80'
+                    ];
+                    const tried = parseInt(e.target.dataset.fallbackIdx || '0', 10);
+                    if (tried < fallbacks.length) {
+                      e.target.dataset.fallbackIdx = String(tried + 1);
+                      e.target.src = fallbacks[tried];
+                    }
+                  }}
                 />
 
                 {/* Photo Index / Total Counter Pill */}
@@ -505,6 +517,10 @@ export default function CarDetailsPage() {
                 src={images[activeImageIndex]}
                 alt={`${car.name} photo`}
                 className="max-h-[70vh] max-w-full object-contain drop-shadow-2xl transition-all duration-300"
+                onError={(e) => {
+                  const fallback = 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80';
+                  if (e.target.src !== fallback) e.target.src = fallback;
+                }}
               />
 
               {/* Left Button */}
