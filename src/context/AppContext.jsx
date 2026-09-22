@@ -18,7 +18,7 @@ import {
   dbSaveBooking,
   dbLoadInquiries,
   dbSaveInquiry
-} from '../utils/firebase';
+} from '../utils/appwrite';
 
 
 const APP_ORIGIN = 'https://www.ottorental.com';

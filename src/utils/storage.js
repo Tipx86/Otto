@@ -189,48 +189,41 @@ export function compressImageFile(file, maxWidth = 1280, quality = 0.82) {
   });
 }
 
+import { uploadImageToAppwrite } from './appwrite';
+
 /**
- * Uploads an image to Vercel Blob via /api/upload.
- * If Vercel Blob is configured, returns { success: true, url: blobUrl, source: 'cloud', configured: true }
- * If Vercel Blob is not configured, returns { success: true, url: compressedDataUrl, source: 'local', configured: false }
+ * Uploads an image to Appwrite Cloud Storage (bucket: fleet-photos).
+ * Falls back to compressed local dataUrl if offline.
  */
 export async function uploadImageToCloud(fileOrDataUrl, filename = 'photo.jpg') {
-  let dataUrl = '';
   let name = filename;
+  let fileToUpload = fileOrDataUrl;
 
   if (fileOrDataUrl instanceof File || fileOrDataUrl instanceof Blob) {
     name = fileOrDataUrl.name || filename;
-    dataUrl = await compressImageFile(fileOrDataUrl, 1280, 0.82);
-  } else if (typeof fileOrDataUrl === 'string') {
-    dataUrl = fileOrDataUrl;
-  } else {
-    throw new Error('Invalid image input');
   }
 
   // If already an HTTP/HTTPS URL, return as-is
-  if (dataUrl.startsWith('http://') || dataUrl.startsWith('https://')) {
-    return { success: true, url: dataUrl, source: 'external' };
+  if (typeof fileOrDataUrl === 'string' && (fileOrDataUrl.startsWith('http://') || fileOrDataUrl.startsWith('https://'))) {
+    return { success: true, url: fileOrDataUrl, source: 'external', configured: true };
   }
 
   try {
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: dataUrl, filename: name })
-    });
-
-    if (res.ok) {
-      const json = await res.json();
-      if (json.success && json.url) {
-        return { success: true, url: json.url, source: 'cloud', configured: true };
-      }
-      if (json.configured === false) {
-        return { success: true, url: dataUrl, source: 'local', configured: false, message: json.message };
-      }
+    const res = await uploadImageToAppwrite(fileToUpload, name);
+    if (res.success && res.url) {
+      return { success: true, url: res.url, source: 'cloud', configured: true };
     }
   } catch (err) {
-    console.warn('[Upload Image] Cloud upload failed, falling back to local:', err);
+    console.warn('[Upload Image] Appwrite Cloud upload failed:', err);
   }
 
-  return { success: true, url: dataUrl, source: 'local', configured: false };
+  // Local fallback if offline
+  let dataUrl = '';
+  if (fileOrDataUrl instanceof File || fileOrDataUrl instanceof Blob) {
+    dataUrl = await compressImageFile(fileOrDataUrl, 1280, 0.82);
+  } else if (typeof fileOrDataUrl === 'string') {
+    dataUrl = fileOrDataUrl;
+  }
+
+  return { success: true, url: dataUrl, source: 'local', configured: true };
 }
